@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Position Match Challenge</title>
+  <style>
+    :root{
+      --navy:#0D3C55; --orange:#FF851B; --green:#2ECC40; --tan:#d4a574;
+      --panel:#fff6e5; font-family:Georgia,serif;
+    }
+    body{margin:18px;background:#f7fbfb;color:#0d2330;}
+    .card{max-width:920px;margin:0 auto;padding:0 12px;}
+    .header{background:var(--navy);color:#fff;padding:18px;border-radius:10px;text-align:center}
+    .field{position:relative;width:100%;height:460px;background:linear-gradient(#2ecc40,#28b24a);border-radius:12px;margin:18px 0;padding:12px;box-sizing:border-box}
+    .dirt{position:absolute;width:60%;height:60%;background:var(--tan);border-radius:50%;top:38%;left:20%;opacity:.85}
+    .dropzone{position:absolute;width:96px;height:40px;background:rgba(255,255,255,0.28);border:2px dashed var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;padding:4px;box-sizing:border-box}
+    .draggables{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+    .draggable{background:var(--navy);color:#fff;padding:8px 12px;border-radius:6px;cursor:grab;user-select:none}
+    .draggable[aria-grabbed="true"]{opacity:.6}
+    #feedback{min-height:40px;text-align:center;margin:8px 0;font-size:1rem}
+    button{background:var(--orange);border:0;color:#fff;padding:10px 16px;border-radius:6px;cursor:pointer}
+    .a11y-hint{font-size:.9rem;color:#333;opacity:.85;text-align:center}
+    /* responsive */
+    @media (max-width:640px){
+      .dropzone{width:86px;height:36px;font-size:.9rem}
+      .draggable{padding:8px 10px}
+      .field{height:420px}
+    }
+  </style>
+</head>
+<body>
+  <main class="card" id="gameRoot">
+    <header class="header" role="banner">
+      <h1 style="margin:.2rem 0">Position Match Challenge</h1>
+      <p style="margin:0;font-style:italic">Drag (or tap) a position name to its correct spot on the field</p>
+    </header>
+
+    <section aria-labelledby="field-label" class="field" id="field">
+      <h2 id="field-label" class="visually-hidden" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Baseball field</h2>
+      <div class="dirt" aria-hidden="true"></div>
+
+      <!-- Drop zones (dataset position keys) -->
+      <div class="dropzone" data-position="pitcher" style="top:52%;left:47%" tabindex="0" aria-label="Drop zone for Pitcher"></div>
+      <div class="dropzone" data-position="catcher" style="top:68%;left:47%" tabindex="0" aria-label="Drop zone for Catcher"></div>
+      <div class="dropzone" data-position="first" style="top:48%;left:70%" tabindex="0" aria-label="Drop zone for First Base"></div>
+      <div class="dropzone" data-position="second" style="top:38%;left:60%" tabindex="0" aria-label="Drop zone for Second Base"></div>
+      <div class="dropzone" data-position="third" style="top:48%;left:24%" tabindex="0" aria-label="Drop zone for Third Base"></div>
+      <div class="dropzone" data-position="shortstop" style="top:38%;left:34%" tabindex="0" aria-label="Drop zone for Shortstop"></div>
+      <div class="dropzone" data-position="left" style="top:12%;left:15%" tabindex="0" aria-label="Drop zone for Left Field"></div>
+      <div class="dropzone" data-position="center" style="top:8%;left:47%" tabindex="0" aria-label="Drop zone for Center Field"></div>
+      <div class="dropzone" data-position="right" style="top:12%;left:75%" tabindex="0" aria-label="Drop zone for Right Field"></div>
+    </section>
+
+    <div class="draggables" id="labels" aria-live="polite">
+      <div class="draggable" role="button" tabindex="0" data-position="pitcher" aria-grabbed="false">Pitcher</div>
+      <div class="draggable" role="button" tabindex="0" data-position="catcher" aria-grabbed="false">Catcher</div>
+      <div class="draggable" role="button" tabindex="0" data-position="first" aria-grabbed="false">First Base</div>
+      <div class="draggable" role="button" tabindex="0" data-position="second" aria-grabbed="false">Second Base</div>
+      <div class="draggable" role="button" tabindex="0" data-position="third" aria-grabbed="false">Third Base</div>
+      <div class="draggable" role="button" tabindex="0" data-position="shortstop" aria-grabbed="false">Shortstop</div>
+      <div class="draggable" role="button" tabindex="0" data-position="left" aria-grabbed="false">Left Field</div>
+      <div class="draggable" role="button" tabindex="0" data-position="center" aria-grabbed="false">Center Field</div>
+      <div class="draggable" role="button" tabindex="0" data-position="right" aria-grabbed="false">Right Field</div>
+    </div>
+
+    <div id="feedback" aria-live="polite" aria-atomic="true"></div>
+
+    <div style="text-align:center;margin:12px 0">
+      <button id="resetBtn" type="button">Reset Game</button>
+    </div>
+
+    <p class="a11y-hint">Tip: On touch devices tap a label, then tap the field spot to place. Use Tab + Enter to operate by keyboard.</p>
+  </main>
+
+  <script>
+  (function () {
+    // State
+    const totalPositions = 9;
+    let correct = 0;
+    let selectedLabel = null; // for tap-to-place
+    const root = document.getElementById('gameRoot');
+
+    // Elements
+    const draggables = Array.from(root.querySelectorAll('.draggable'));
+    const dropzones = Array.from(root.querySelectorAll('.dropzone'));
+    const feedback = document.getElementById('feedback');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Ensure draggable attr for browsers
+    draggables.forEach(el => {
+      el.setAttribute('draggable','true');
+      el.addEventListener('dragstart', onDragStart);
+      el.addEventListener('keydown', onLabelKeyDown); // keyboard: Enter/Space to select
+      el.addEventListener('click', onLabelClick); // tap select
+      el.addEventListener('touchstart', onLabelTouch, {passive:true});
+    });
+
+    // Dropzone events
+    dropzones.forEach(zone => {
+      zone.addEventListener('dragover', onDragOver);
+      zone.addEventListener('drop', onDrop);
+      zone.addEventListener('dragleave', onDragLeave);
+      zone.addEventListener('keydown', onZoneKeyDown); // keyboard: Enter to place when a label selected
+      zone.addEventListener('click', onZoneClick); // tap place
+      zone.addEventListener('touchstart', onZoneTouch, {passive:true});
+    });
+
+    // Drag handlers
+    function onDragStart(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.dataset.position);
+      // store reference for drop
+      window._dragged = this;
+      this.setAttribute('aria-grabbed','true');
+      setTimeout(()=> this.classList.add('dragging'), 0);
+    }
+    function onDragOver(e) {
+      e.preventDefault(); // allow drop
+      this.style.opacity = '0.9';
+      e.dataTransfer.dropEffect = 'move';
+    }
+    function onDragLeave(e) {
+      this.style.opacity = '';
+    }
+    function onDrop(e) {
+      e.preventDefault();
+      this.style.opacity = '';
+      const dragged = window._dragged || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+      const draggedPos = (window._dragged && window._dragged.dataset.position) || dragged;
+      handlePlacement(this, draggedPos);
+    }
+
+    // Common placement logic
+    function handlePlacement(zone, draggedPosition) {
+      if (!zone || !draggedPosition) return;
+      // prevent double-fill
+      if (zone.dataset.filled === 'true') {
+        flash(zone);
+        setFeedback('That spot is already taken. Try another one.');
+        return;
+      }
+      // find the label element by position
+      const labelEl = draggables.find(d=>d.dataset.position === draggedPosition && d.style.display !== 'none');
+      if (!labelEl) {
+        setFeedback('That label is already used. Reset to try again.');
+        return;
+      }
+      if (zone.dataset.position === draggedPosition) {
+        // correct
+        zone.style.backgroundColor = 'var(--green)';
+        zone.style.border = '2px solid var(--navy)';
+        zone.textContent = labelEl.textContent;
+        zone.dataset.filled = 'true';
+        labelEl.style.display = 'none';
+        correct++;
+        setFeedback('Nice! Correct placement. ('+correct+' / '+totalPositions+')');
+        if (correct === totalPositions) {
+          setFeedback('Perfect! You placed all positions. Well done!', true);
+        }
+      } else {
+        flash(zone);
+        setFeedback('Not quite — try again.');
+      }
+      // cleanup selection state
+      selectedLabel && deselectLabel(selectedLabel);
+      selectedLabel = null;
+    }
+
+    // Tap / click handlers (touch fallback)
+    function onLabelClick(e) {
+      // toggle selection for tap-to-place
+      const el = e.currentTarget;
+      if (el.style.display === 'none') return;
+      if (selectedLabel === el) { deselectLabel(el); selectedLabel=null; return; }
+      if (selectedLabel) deselectLabel(selectedLabel);
+      selectLabel(el);
+      selectedLabel = el;
+      setFeedback('Selected "'+el.textContent+'". Now tap a spot to place.');
+    }
+    function onZoneClick(e) {
+      if (!selectedLabel) { setFeedback('Tap a label first, then tap a spot to place.'); return; }
+      handlePlacement(e.currentTarget, selectedLabel.dataset.position);
+    }
+    function onLabelTouch(e){ onLabelClick(e); }
+    function onZoneTouch(e){ onZoneClick(e); }
+
+    // Keyboard handlers
+    function onLabelKeyDown(e) {
+      // Enter or Space selects/deselects label
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    }
+    function onZoneKeyDown(e) {
+      // Enter places currently selected label
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (selectedLabel) handlePlacement(this, selectedLabel.dataset.position);
+        else setFeedback('Select a label first using Tab + Enter.');
+      }
+    }
+
+    // Utility: select/deselect visual
+    function selectLabel(el) {
+      el.style.outline = '3px solid rgba(13,60,85,0.25)';
+      el.setAttribute('aria-grabbed','true');
+    }
+    function deselectLabel(el) {
+      el.style.outline = '';
+      el.setAttribute('aria-grabbed','false');
+    }
+
+    // Small visual flash for incorrect
+    function flash(zone) {
+      zone.style.transition = 'transform .08s';
+      zone.style.transform = 'translateX(-6px)';
+      setTimeout(()=> zone.style.transform = '', 90);
+    }
+
+    // Feedback
+    function setFeedback(msg, success=false) {
+      feedback.innerHTML = success ? '<strong style="color:var(--green)">'+escapeHtml(msg)+'</strong>' : escapeHtml(msg);
+    }
+    function escapeHtml(str){ return String(str).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+    // Reset
+    function resetGame(){
+      correct = 0;
+      selectedLabel = null;
+      draggables.forEach(d=>{
+        d.style.display = 'inline-block';
+        d.setAttribute('aria-grabbed','false');
+      });
+      dropzones.forEach(z=>{
+        z.textContent = '';
+        z.dataset.filled = 'false';
+        z.style.backgroundColor = 'rgba(255,255,255,0.28)';
+        z.style.border = '2px dashed var(--navy)';
+        z.style.opacity = '';
+      });
+      setFeedback('');
+      window._dragged = null;
+    }
+    resetBtn.addEventListener('click', resetGame);
+
+    // Clean up drag state on drop end
+    document.addEventListener('dragend', function(e){
+      if (window._dragged) {
+        window._dragged.classList.remove('dragging');
+        window._dragged.setAttribute('aria-grabbed','false');
+        window._dragged = null;
+      }
+    });
+
+    // Small: prevent text selection while dragging
+    document.addEventListener('selectstart', function(e){
+      if (e.target.classList.contains('draggable')) e.preventDefault();
+    });
+
+    // Initialize
+    resetGame();
+  })();
+  </script>
+</body>
+</html>
