@@ -21,7 +21,9 @@
     #feedback{min-height:40px;text-align:center;margin:8px 0;font-size:1rem}
     button{background:var(--orange);border:0;color:#fff;padding:10px 16px;border-radius:6px;cursor:pointer}
     .a11y-hint{font-size:.9rem;color:#333;opacity:.85;text-align:center}
-    /* responsive */
+    .codeWrap{display:none;text-align:center;margin-top:12px}
+    .codeBox{display:inline-block;padding:12px 16px;border-radius:8px;background:#fff;border:2px solid var(--navy)}
+    .codeBtn{font-family:inherit;font-size:1.1rem;background:var(--navy);color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
     @media (max-width:640px){
       .dropzone{width:86px;height:36px;font-size:.9rem}
       .draggable{padding:8px 10px}
@@ -37,10 +39,9 @@
     </header>
 
     <section aria-labelledby="field-label" class="field" id="field">
-      <h2 id="field-label" class="visually-hidden" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Baseball field</h2>
+      <h2 id="field-label" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">Baseball field</h2>
       <div class="dirt" aria-hidden="true"></div>
 
-      <!-- Drop zones (dataset position keys) -->
       <div class="dropzone" data-position="pitcher" style="top:52%;left:47%" tabindex="0" aria-label="Drop zone for Pitcher"></div>
       <div class="dropzone" data-position="catcher" style="top:68%;left:47%" tabindex="0" aria-label="Drop zone for Catcher"></div>
       <div class="dropzone" data-position="first" style="top:48%;left:70%" tabindex="0" aria-label="Drop zone for First Base"></div>
@@ -66,6 +67,15 @@
 
     <div id="feedback" aria-live="polite" aria-atomic="true"></div>
 
+    <!-- Completion code container (hidden until finished) -->
+    <div class="codeWrap" id="completionWrap" aria-live="polite">
+      <div class="codeBox" role="region" aria-label="Completion code">
+        <div style="font-size:0.9rem;color:var(--navy);margin-bottom:6px;">Completion Code</div>
+        <button id="completionCode" class="codeBtn" aria-live="polite" aria-label="Copy completion code">ABC123</button>
+        <div id="codeNote" style="font-size:0.8rem;color:#333;margin-top:6px;opacity:.9;">Click the code to copy it. It expires in 24 hours.</div>
+      </div>
+    </div>
+
     <div style="text-align:center;margin:12px 0">
       <button id="resetBtn" type="button">Reset Game</button>
     </div>
@@ -78,7 +88,7 @@
     // State
     const totalPositions = 9;
     let correct = 0;
-    let selectedLabel = null; // for tap-to-place
+    let selectedLabel = null;
     const root = document.getElementById('gameRoot');
 
     // Elements
@@ -86,13 +96,15 @@
     const dropzones = Array.from(root.querySelectorAll('.dropzone'));
     const feedback = document.getElementById('feedback');
     const resetBtn = document.getElementById('resetBtn');
+    const completionWrap = document.getElementById('completionWrap');
+    const completionBtn = document.getElementById('completionCode');
 
     // Ensure draggable attr for browsers
     draggables.forEach(el => {
       el.setAttribute('draggable','true');
       el.addEventListener('dragstart', onDragStart);
-      el.addEventListener('keydown', onLabelKeyDown); // keyboard: Enter/Space to select
-      el.addEventListener('click', onLabelClick); // tap select
+      el.addEventListener('keydown', onLabelKeyDown);
+      el.addEventListener('click', onLabelClick);
       el.addEventListener('touchstart', onLabelTouch, {passive:true});
     });
 
@@ -101,8 +113,8 @@
       zone.addEventListener('dragover', onDragOver);
       zone.addEventListener('drop', onDrop);
       zone.addEventListener('dragleave', onDragLeave);
-      zone.addEventListener('keydown', onZoneKeyDown); // keyboard: Enter to place when a label selected
-      zone.addEventListener('click', onZoneClick); // tap place
+      zone.addEventListener('keydown', onZoneKeyDown);
+      zone.addEventListener('click', onZoneClick);
       zone.addEventListener('touchstart', onZoneTouch, {passive:true});
     });
 
@@ -110,13 +122,12 @@
     function onDragStart(e) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', this.dataset.position);
-      // store reference for drop
       window._dragged = this;
       this.setAttribute('aria-grabbed','true');
       setTimeout(()=> this.classList.add('dragging'), 0);
     }
     function onDragOver(e) {
-      e.preventDefault(); // allow drop
+      e.preventDefault();
       this.style.opacity = '0.9';
       e.dataTransfer.dropEffect = 'move';
     }
@@ -134,20 +145,17 @@
     // Common placement logic
     function handlePlacement(zone, draggedPosition) {
       if (!zone || !draggedPosition) return;
-      // prevent double-fill
       if (zone.dataset.filled === 'true') {
         flash(zone);
         setFeedback('That spot is already taken. Try another one.');
         return;
       }
-      // find the label element by position
       const labelEl = draggables.find(d=>d.dataset.position === draggedPosition && d.style.display !== 'none');
       if (!labelEl) {
         setFeedback('That label is already used. Reset to try again.');
         return;
       }
       if (zone.dataset.position === draggedPosition) {
-        // correct
         zone.style.backgroundColor = 'var(--green)';
         zone.style.border = '2px solid var(--navy)';
         zone.textContent = labelEl.textContent;
@@ -156,20 +164,19 @@
         correct++;
         setFeedback('Nice! Correct placement. ('+correct+' / '+totalPositions+')');
         if (correct === totalPositions) {
-          setFeedback('Perfect! You placed all positions. Well done!', true);
+          // show completion code when finished
+          showCompletionCode();
         }
       } else {
         flash(zone);
         setFeedback('Not quite — try again.');
       }
-      // cleanup selection state
       selectedLabel && deselectLabel(selectedLabel);
       selectedLabel = null;
     }
 
     // Tap / click handlers (touch fallback)
     function onLabelClick(e) {
-      // toggle selection for tap-to-place
       const el = e.currentTarget;
       if (el.style.display === 'none') return;
       if (selectedLabel === el) { deselectLabel(el); selectedLabel=null; return; }
@@ -187,14 +194,12 @@
 
     // Keyboard handlers
     function onLabelKeyDown(e) {
-      // Enter or Space selects/deselects label
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         this.click();
       }
     }
     function onZoneKeyDown(e) {
-      // Enter places currently selected label
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         if (selectedLabel) handlePlacement(this, selectedLabel.dataset.position);
@@ -202,7 +207,7 @@
       }
     }
 
-    // Utility: select/deselect visual
+    // Visual helpers
     function selectLabel(el) {
       el.style.outline = '3px solid rgba(13,60,85,0.25)';
       el.setAttribute('aria-grabbed','true');
@@ -211,24 +216,65 @@
       el.style.outline = '';
       el.setAttribute('aria-grabbed','false');
     }
-
-    // Small visual flash for incorrect
     function flash(zone) {
       zone.style.transition = 'transform .08s';
       zone.style.transform = 'translateX(-6px)';
       setTimeout(()=> zone.style.transform = '', 90);
     }
-
-    // Feedback
     function setFeedback(msg, success=false) {
       feedback.innerHTML = success ? '<strong style="color:var(--green)">'+escapeHtml(msg)+'</strong>' : escapeHtml(msg);
     }
     function escapeHtml(str){ return String(str).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
 
+    // Completion code utilities
+    function generateCode(length = 6) {
+      const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      let out = '';
+      for (let i = 0; i < length; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+      return out;
+    }
+
+    function showCompletionCode() {
+      const code = generateCode(6);
+      completionWrap.dataset.code = code;
+      completionBtn.textContent = code;
+      completionWrap.style.display = 'block';
+      setFeedback('Great job! Copy the completion code and paste it in the Canvas Quiz to receive credit.', true);
+
+      completionBtn.onclick = function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(code).then(function(){
+            const old = completionBtn.textContent;
+            completionBtn.textContent = 'Copied!';
+            setTimeout(()=> completionBtn.textContent = old, 900);
+          }, function(){
+            selectTextFallback(completionBtn);
+          });
+        } else {
+          selectTextFallback(completionBtn);
+        }
+      };
+
+      // Optional: keep a small local record for instructor spot-checks (in-memory only)
+      completionWrap.dataset.issuedAt = new Date().toISOString();
+      // Note: this does not send data anywhere. If you want a server log, I can show a simple Google Apps Script or other endpoint later.
+    }
+
+    function selectTextFallback(el){
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      try { document.execCommand('copy'); } catch(e) {}
+    }
+
     // Reset
     function resetGame(){
       correct = 0;
       selectedLabel = null;
+      completionWrap.style.display = 'none';
+      completionWrap.dataset.code = '';
       draggables.forEach(d=>{
         d.style.display = 'inline-block';
         d.setAttribute('aria-grabbed','false');
@@ -254,12 +300,12 @@
       }
     });
 
-    // Small: prevent text selection while dragging
+    // Prevent text selection while dragging
     document.addEventListener('selectstart', function(e){
       if (e.target.classList.contains('draggable')) e.preventDefault();
     });
 
-    // Initialize
+    // Kick off
     resetGame();
   })();
   </script>
