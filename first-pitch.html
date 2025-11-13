@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>First Pitch Challenge - Baseball Basics</title>
+  <style>
+    :root {
+      --grass: #2ECC40;
+      --dirt: #8B6914;
+      --warning: #FF851B;
+      --navy: #0D3C55;
+      --sky: #87CEEB;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Georgia, serif;
+      background: linear-gradient(to bottom, var(--sky) 0%, var(--sky) 40%, var(--grass) 40%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .game-container {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    
+    h1 {
+      color: var(--navy);
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+    
+    .instructions {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    
+    .stadium {
+      background: var(--grass);
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      position: relative;
+      min-height: 200px;
+    }
+    
+    .diamond {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+      position: relative;
+      transform: rotate(45deg);
+    }
+    
+    .base {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      background: white;
+      border: 2px solid var(--dirt);
+      transition: all 0.3s;
+    }
+    
+    .base.occupied {
+      background: var(--warning);
+      animation: pulse 1s infinite;
+      box-shadow: 0 0 10px var(--warning);
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    #first { top: 0; right: 0; }
+    #second { top: 0; left: 0; }
+    #third { bottom: 0; left: 0; }
+    #home { bottom: 0; right: 0; background: white; transform: scale(1.2); }
+    
+    .scoreboard {
+      background: var(--navy);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    
+    .score-item {
+      margin: 5px 10px;
+    }
+    
+    .score-item span {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #FFD700;
+    }
+    
+    .question-box {
+      background: #f8f8f8;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 2px solid var(--navy);
+    }
+    
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 15px;
+      color: var(--navy);
+    }
+    
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+    }
+    
+    .answer-btn {
+      background: white;
+      border: 2px solid var(--navy);
+      padding: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 1em;
+      font-family: inherit;
+    }
+    
+    .answer-btn:hover:not(:disabled) {
+      background: var(--navy);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .answer-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .feedback {
+      text-align: center;
+      font-size: 1.3em;
+      margin: 20px 0;
+      min-height: 60px;
+      font-weight: bold;
+    }
+    
+    .feedback.strike { color: #dc3545; }
+    .feedback.single { color: #28a745; }
+    .feedback.double { color: #17a2b8; }
+    .feedback.triple { color: #6f42c1; }
+    .feedback.homerun { 
+      color: #FFD700; 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      font-size: 1.8em;
+      animation: celebrate 1s ease-out;
+    }
+    
+    @keyframes celebrate {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .completion-code {
+      display: none;
+      background: #28a745;
+      color: white
