@@ -129,6 +129,7 @@
       font-size: 1.2em;
       margin-bottom: 15px;
       color: var(--navy);
+      font-weight: bold;
     }
     
     .answers {
@@ -146,6 +147,7 @@
       transition: all 0.3s;
       font-size: 1em;
       font-family: inherit;
+      text-align: left;
     }
     
     .answer-btn:hover:not(:disabled) {
@@ -165,6 +167,7 @@
       margin: 20px 0;
       min-height: 60px;
       font-weight: bold;
+      padding: 10px;
     }
     
     .feedback.strike { color: #dc3545; }
@@ -187,4 +190,38 @@
     .completion-code {
       display: none;
       background: #28a745;
-      color: white
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .completion-code h2 {
+      margin-bottom: 10px;
+    }
+    
+    .code-display {
+      background: white;
+      color: var(--navy);
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 1.5em;
+      font-weight: bold;
+      letter-spacing: 3px;
+      cursor: pointer;
+      margin: 10px 0;
+      display: inline-block;
+    }
+    
+    .code-display:hover {
+      transform: scale(1.05);
+    }
+    
+    .next-btn {
+      background: var(--navy);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
