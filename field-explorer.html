@@ -126,47 +126,11 @@
       box-shadow: 0 0 25px rgba(255,255,255,0.6);
     }
     
-    .outfield {
+    .outfield-area {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-    
-    .outfield-left {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 33%;
-      height: 40%;
       cursor: pointer;
       opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .outfield-center {
-      position: absolute;
-      top: 0;
-      left: 33%;
-      width: 34%;
-      height: 40%;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .outfield-right {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 33%;
-      height: 40%;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.3s;
+      transition: all 0.3s;
     }
     
     .outfield-area:hover {
@@ -174,13 +138,107 @@
       background: rgba(255,255,255,0.3);
     }
     
-    .foul-line {
-      position: absolute;
-      bottom: 50%;
-      width: 3px;
-      height: 50%;
-      background: white;
-      pointer-events: none;
+    .outfield-left {
+      top: 0;
+      left: 0;
+      width: 33%;
+      height: 40%;
     }
     
-    .foul-line
+    .outfield-center {
+      top: 0;
+      left: 33%;
+      width: 34%;
+      height: 40%;
+    }
+    
+    .outfield-right {
+      top: 0;
+      right: 0;
+      width: 33%;
+      height: 40%;
+    }
+    
+    .info-card {
+      position: absolute;
+      background: white;
+      border: 3px solid #0D3C55;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 250px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 100;
+      animation: popIn 0.3s ease-out;
+    }
+    
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .info-card h3 {
+      color: #0D3C55;
+      margin-bottom: 10px;
+      font-size: 1.3em;
+    }
+    
+    .info-card p {
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 25px;
+      height: 25px;
+      border: 2px solid #0D3C55;
+      border-radius: 50%;
+      background: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #0D3C55;
+    }
+    
+    .close-btn:hover {
+      background: #0D3C55;
+      color: white;
+    }
+    
+    .progress-tracker {
+      margin-top: 30px;
+      text-align: center;
+      color: #666;
+    }
+    
+    .discovered {
+      color: #28a745;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Baseball Field Explorer</h1>
+    <p class="subtitle">Click anywhere on the field to discover what each area is called!</p>
+    
+    <div class="field-container">
+      <div class="field">
+        <!-- Infield Diamond -->
+        <div class="diamond" onclick="showInfo(event, 'infield')"></div>
+        
+        <!-- Bases -->
+        <div class="base" id="home-plate" onclick="showInfo(event, 'home')"></div>
+        <div class="base" id="first-base" onclick="showInfo(event, 'first')"></div>
+        <div class="base" id="second-base" onclick="showInfo(event, 'second')">
