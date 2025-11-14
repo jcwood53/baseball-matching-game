@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Field Explorer — Refined Layout</title>
+<title>Field Explorer — Adjusted Proportions</title>
 <style>
   :root{
     --bg:#eaf8ff;
-    --grass-dark:#245f3a;
-    --grass-light:#2e8b57;
+    --grass-dark:#225e38;
+    --grass-light:#2f8c57;
     --dirt-1:#d6a770;
     --dirt-2:#c28f4f;
     --base-white:#ffffff;
@@ -16,21 +16,21 @@
     --accent:#faad33;
     --stroke:#0b3940;
     --card-bg:#ffffff;
-    --max-w:1400px;
+    --max-w:1500px;
   }
   html,body{height:100%;margin:0}
   body{
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
     background: linear-gradient(180deg,var(--bg), #d9eff8 60%);
-    display:flex;justify-content:center;padding:20px;color:var(--stroke);
+    display:flex;justify-content:center;padding:16px;color:var(--stroke);
   }
-  .wrap{width:100%;max-width:var(--max-w);background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(6,30,40,0.12);padding:18px;box-sizing:border-box}
-  header{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+  .wrap{width:100%;max-width:var(--max-w);background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(6,30,40,0.12);padding:16px;box-sizing:border-box}
+  header{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
   h1{margin:0;font-size:20px}
   .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
-  .layout{display:flex;gap:18px;flex-wrap:wrap}
+  .layout{display:flex;gap:14px;flex-wrap:wrap}
   .field{flex:1 1 920px;min-width:360px;background:linear-gradient(180deg,#e9fbef,#dff6eb);padding:10px;border-radius:10px;position:relative}
-  .side{width:340px;min-width:260px}
+  .side{width:320px;min-width:260px}
   .panel{background:#fff;border-radius:10px;padding:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(6,30,40,0.04)}
   svg{width:100%;height:auto;display:block}
   .info{position:absolute;z-index:50;min-width:240px;background:var(--card-bg);border-radius:10px;padding:12px;box-shadow:0 12px 30px rgba(6,30,40,0.12);border:1px solid rgba(6,30,40,0.06);display:none}
@@ -49,22 +49,21 @@
   <div class="wrap" role="main">
     <header>
       <div>
-        <h1>Field Explorer — Refined Layout</h1>
-        <div class="subtitle">Diamond enlarged 50%; perfect square rotated to a diamond; circular mound moved closer; rotated coach boxes; rotated home plate; foul lines aligned.</div>
+        <h1>Field Explorer — Adjusted Proportions</h1>
+        <div class="subtitle">Outfield enlarged to match infield; mound circular and closer; plates, labels, coach boxes adjusted.</div>
       </div>
     </header>
 
     <div class="layout">
       <section class="field panel" aria-label="Baseball field">
-        <!-- Info card -->
         <div id="infoCard" class="info" role="dialog" aria-hidden="true">
           <div class="close" id="cardClose" tabindex="0" aria-label="Close">✕</div>
           <h3 id="infoTitle">Title</h3>
           <p id="infoBody">Description</p>
         </div>
 
-        <!-- SVG field -->
-        <svg id="fieldSVG" viewBox="0 0 1600 1300" role="img" aria-label="Baseball field diagram">
+        <!-- SVG field: larger canvas so outfield can expand -->
+        <svg id="fieldSVG" viewBox="0 0 1800 1500" role="img" aria-label="Baseball field diagram">
           <defs>
             <linearGradient id="gGrass" x1="0" x2="1">
               <stop offset="0" stop-color="var(--grass-light)"/>
@@ -77,126 +76,118 @@
             <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#0a1a22" flood-opacity="0.12"/></filter>
           </defs>
 
-          <!-- full grass -->
-          <rect x="0" y="0" width="1600" height="1300" fill="url(#gGrass)"/>
+          <!-- full grass/background enlarged to match diamond -->
+          <rect x="0" y="0" width="1800" height="1500" fill="url(#gGrass)"/>
 
-          <!-- warning track / outfield arc -->
-          <path d="M120 180 A760 760 0 0 1 1480 180 L1480 240 A780 780 0 0 0 120 240 Z" fill="#d9c0a0" opacity="0.6"/>
+          <!-- large outfield arc and warning track scaled outward so grass fits the infield size -->
+          <path d="M140 220 A920 920 0 0 1 1660 220 L1660 300 A940 940 0 0 0 140 300 Z" fill="#d9c0a0" opacity="0.56"/>
 
-          <!-- base geometry parameters: center at cx=800, cy=700 -->
-          <!-- foul lines aligned with baselines: start at rotated home plate corners (we compute by transform) -->
-
-          <!-- Big diamond implemented as a perfect square rotated 45deg: side = 2 * baseRadius / sqrt(2)
-               We'll draw the square's points directly relative to center (cx,cy). Using baseRadius = 540 (50% larger than prior 360). -->
-          <g id="diamondRoot" transform="translate(800,700)">
-            <!-- compute diamond points: top (0,-540), right (540,0), bottom (0,540), left (-540,0) -->
-            <path id="infieldDirt" d="M0 -540 L540 0 L0 540 L-540 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2" filter="url(#soft)"/>
+          <!-- Diamond center; chosen to give large outfield space: center at (900,800).
+               Diamond is a perfect square rotated into diamond shape. Side radius R = 680 (approx). -->
+          <g id="diamondRoot" transform="translate(900,800)">
+            <!-- infield dirt as perfect rotated square (diamond) -->
+            <path id="infieldDirt" d="M0 -680 L680 0 L0 680 L-680 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2" filter="url(#soft)"/>
 
             <!-- baselines (thick white) -->
-            <path d="M0 -540 L540 0" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
-            <path d="M540 0 L0 540" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
-            <path d="M0 540 L-540 0" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
-            <path d="M-540 0 L0 -540" stroke="#fff" stroke-width="14" stroke-linecap="round"/>
+            <path d="M0 -680 L680 0" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+            <path d="M680 0 L0 680" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+            <path d="M0 680 L-680 0" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+            <path d="M-680 0 L0 -680" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
 
-            <!-- chalk inner edges -->
-            <path d="M0 -540 L540 0" stroke="#f4e6cf" stroke-width="4" opacity="0.85"/>
-            <path d="M540 0 L0 540" stroke="#f4e6cf" stroke-width="4" opacity="0.85"/>
-            <path d="M0 540 L-540 0" stroke="#f4e6cf" stroke-width="4" opacity="0.85"/>
-            <path d="M-540 0 L0 -540" stroke="#f4e6cf" stroke-width="4" opacity="0.85"/>
+            <!-- thin chalk edges -->
+            <path d="M0 -680 L680 0" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
+            <path d="M680 0 L0 680" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
+            <path d="M0 680 L-680 0" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
+            <path d="M-680 0 L0 -680" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
 
-            <!-- Bases (bags) scaled up for clarity: 90x90 -->
-            <g id="firstGroup" transform="translate(540,0)">
-              <rect id="firstBase" class="hotspot" x="-45" y="-45" width="90" height="90" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="First base"></rect>
-              <text x="0" y="132" font-size="20" text-anchor="middle" fill="#0b3b40">First baseman</text>
+            <!-- Bases increased and centered on corners: 110x110 for larger tappable targets -->
+            <g id="firstGroup" transform="translate(680,0)">
+              <rect id="firstBase" class="hotspot" x="-55" y="-55" width="110" height="110" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="First base"></rect>
+              <text id="firstLabel" x="0" y="142" font-size="22" text-anchor="middle" fill="#fff">First</text>
             </g>
 
-            <g id="secondGroup" transform="translate(0,-540)">
-              <rect id="secondBase" class="hotspot" x="-45" y="-45" width="90" height="90" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="Second base"></rect>
-              <text x="0" y="-132" font-size="20" text-anchor="middle" fill="#0b3b40">Second baseman</text>
+            <g id="secondGroup" transform="translate(0,-680)">
+              <rect id="secondBase" class="hotspot" x="-55" y="-55" width="110" height="110" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="Second base"></rect>
+              <text id="secondLabel" x="0" y="-142" font-size="22" text-anchor="middle" fill="#fff">Second</text>
             </g>
 
-            <g id="thirdGroup" transform="translate(-540,0)">
-              <rect id="thirdBase" class="hotspot" x="-45" y="-45" width="90" height="90" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="Third base"></rect>
-              <text x="0" y="132" font-size="20" text-anchor="middle" fill="#0b3b40">Third baseman</text>
+            <g id="thirdGroup" transform="translate(-680,0)">
+              <rect id="thirdBase" class="hotspot" x="-55" y="-55" width="110" height="110" rx="6" fill="#fff" stroke="#c6c6c6" stroke-width="5" tabindex="0" role="button" aria-label="Third base"></rect>
+              <text id="thirdLabel" x="0" y="142" font-size="22" text-anchor="middle" fill="#fff">Third</text>
             </g>
 
-            <!-- home plate: rotated 180deg (point now up relative to previous) -->
-            <g id="homeGroup" transform="translate(0,540) rotate(180)">
-              <polygon id="homePlate" class="hotspot" points="-40,0 40,0 40,-28 0,-56 -40,-28" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Home plate"></polygon>
-              <!-- removed duplicate "Catcher" label per request -->
+            <!-- home plate: rotated 180 degrees (point facing outfield correctly) -->
+            <g id="homeGroup" transform="translate(0,680) rotate(180)">
+              <polygon id="homePlate" class="hotspot" points="-48,0 48,0 48,-34 0,-68 -48,-34" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Home plate"></polygon>
             </g>
 
-            <!-- circular pitcher's mound moved closer to home (translate y positive is toward bottom, so move mound down toward home) -->
-            <!-- previous mound at -120 from center; now move to -95 to be closer to home (i.e., 25 units closer) -->
-            <g id="moundGroup" transform="translate(0,-95)">
-              <circle id="moundCircle" cx="0" cy="0" r="64" fill="#b97f4f" stroke="#9b6237" stroke-width="4" filter="url(#soft)"></circle>
-              <!-- rectangular pitcher plate: width = 90 (same as base width), height shortened to 6 (about 1/3 shorter than earlier) -->
-              <rect id="pitcherPlate" class="hotspot" x="-45" y="-6" width="90" height="6" rx="2" fill="#fff" stroke="#c6c6c6" stroke-width="2" tabindex="0" role="button" aria-label="Pitcher's plate"></rect>
+            <!-- Pitcher's mound: circular mound moved slightly closer to home (from -120 to -105),
+                 mound circle radius increased for visibility, pitcher's plate shortened by 1/3 and thickened -->
+            <g id="moundGroup" transform="translate(0,-105)">
+              <circle id="moundCircle" cx="0" cy="0" r="86" fill="#b97f4f" stroke="#9b6237" stroke-width="5" filter="url(#soft)"></circle>
+              <!-- pitcher's plate: width = 110 (same as base width), height shortened by 1/3 => if original 12, now 8;
+                   increased stroke thickness for visual 'double thickness' -->
+              <rect id="pitcherPlate" class="hotspot" x="-55" y="-8" width="110" height="8" rx="3" fill="#fff" stroke="#7a7a7a" stroke-width="3" tabindex="0" role="button" aria-label="Pitcher's plate"></rect>
             </g>
 
-            <!-- shortstop between and slightly behind second and third -->
-            <g id="shortstopGroup" transform="translate(-210,-300)">
-              <circle id="shortstop" class="hotspot" r="20" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Shortstop"></circle>
-              <text x="0" y="56" font-size="16" text-anchor="middle" fill="#0b3b40">Shortstop</text>
+            <!-- Shortstop positioned between and slightly behind second and third -->
+            <g id="shortstopGroup" transform="translate(-210,-360)">
+              <circle id="shortstop" class="hotspot" r="26" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Shortstop"></circle>
+              <text x="0" y="72" font-size="18" text-anchor="middle" fill="#fff">SS</text>
             </g>
 
-            <!-- faint axis for orientation -->
-            <line x1="0" y1="-640" x2="0" y2="640" stroke="#ffffff" stroke-width="1" opacity="0.05"/>
+            <!-- faint center axis for orientation -->
+            <line x1="0" y1="-760" x2="0" y2="760" stroke="#ffffff" stroke-width="1" opacity="0.04"/>
           </g>
 
-          <!-- foul lines now aligned to the baseline end points by drawing from home plate corners -->
-          <!-- compute home plate corner coordinates in global space:
-               diamond center at (800,700), home at (800,700+540) => (800,1240)
-               home plate polygon points transformed by rotate(180) will place corners relative; we'll draw lines that follow baseline directions from home center -->
-          <line id="foulRight" x1="800" y1="1240" x2="1400" y2="120" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-          <line id="foulLeft" x1="800" y1="1240" x2="200" y2="120" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-          <line x1="800" y1="1240" x2="1400" y2="120" stroke="#f7ead7" stroke-width="2" stroke-dasharray="7 4" opacity="0.6"/>
-          <line x1="800" y1="1240" x2="200" y2="120" stroke="#f7ead7" stroke-width="2" stroke-dasharray="7 4" opacity="0.6"/>
+          <!-- Foul lines aligned with baselines: draw lines from rotated home plate corners along baseline vectors -->
+          <!-- Compute home center = (900,1480) because diamond center (900,800) + bottom offset 680 => 1480 -->
+          <line id="foulRight" x1="900" y1="1480" x2="1700" y2="240" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+          <line id="foulLeft" x1="900" y1="1480" x2="100" y2="240" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+          <line x1="900" y1="1480" x2="1700" y2="240" stroke="#f7ead7" stroke-width="2" stroke-dasharray="8 5" opacity="0.6"/>
+          <line x1="900" y1="1480" x2="100" y2="240" stroke="#f7ead7" stroke-width="2" stroke-dasharray="8 5" opacity="0.6"/>
 
-          <!-- coach boxes rotated to be parallel with baselines: compute baseline angle = 45deg -->
+          <!-- Coach boxes rotated to be parallel with baselines (45deg) and offset just outside the baselines near first/third -->
           <g id="coachBoxes">
-            <!-- first base coach box: placed near first base, rotated 45deg -->
-            <g transform="translate(800,700) translate(420,80) rotate(45)">
-              <rect x="-60" y="-18" width="120" height="36" rx="6" fill="#fff" stroke="#d9d9d9"></rect>
-              <text x="0" y="6" font-size="14" text-anchor="middle" fill="#596a6e">Coach's box</text>
+            <g transform="translate(900,800) translate(520,110) rotate(45)">
+              <rect x="-84" y="-24" width="168" height="48" rx="8" fill="#fff" stroke="#d9d9d9"></rect>
+              <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box</text>
             </g>
-
-            <!-- third base coach box: placed near third base, rotated -45deg -->
-            <g transform="translate(800,700) translate(-420,80) rotate(-45)">
-              <rect x="-60" y="-18" width="120" height="36" rx="6" fill="#fff" stroke="#d9d9d9"></rect>
-              <text x="0" y="6" font-size="14" text-anchor="middle" fill="#596a6e">Coach's box</text>
+            <g transform="translate(900,800) translate(-520,110) rotate(-45)">
+              <rect x="-84" y="-24" width="168" height="48" rx="8" fill="#fff" stroke="#d9d9d9"></rect>
+              <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box</text>
             </g>
           </g>
 
-          <!-- on-deck circles moved laterally toward home by ~40 units -->
+          <!-- On-deck circles moved inward toward home by ~40 units laterally (approx 2 inches in scale) -->
           <g id="onDecks">
-            <circle cx="240" cy="980" r="26" fill="#fff" stroke="#d9d9d9"></circle>
-            <text x="240" y="1024" font-size="13" text-anchor="middle" fill="#596a6e">On-deck</text>
+            <circle cx="280" cy="1160" r="32" fill="#fff" stroke="#d9d9d9"></circle>
+            <text x="280" y="1208" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
 
-            <circle cx="1360" cy="980" r="26" fill="#fff" stroke="#d9d9d9"></circle>
-            <text x="1360" y="1024" font-size="13" text-anchor="middle" fill="#596a6e">On-deck</text>
+            <circle cx="1520" cy="1160" r="32" fill="#fff" stroke="#d9d9d9"></circle>
+            <text x="1520" y="1208" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
           </g>
 
-          <!-- dugouts -->
+          <!-- Dugouts moved to the bottom corners at the edge of diagram -->
           <g id="dugouts">
-            <rect x="160" y="1020" width="220" height="88" rx="12" fill="#f6f6f6" stroke="#e6e6e6"></rect>
-            <text x="270" y="1074" font-size="14" text-anchor="middle" fill="#596a6e">Dugout</text>
+            <rect x="40" y="1330" width="260" height="120" rx="14" fill="#f6f6f6" stroke="#e6e6e6"></rect>
+            <text x="170" y="1396" font-size="16" text-anchor="middle" fill="#596a6e">Dugout</text>
 
-            <rect x="1220" y="1020" width="220" height="88" rx="12" fill="#f6f6f6" stroke="#e6e6e6"></rect>
-            <text x="1330" y="1074" font-size="14" text-anchor="middle" fill="#596a6e">Dugout</text>
+            <rect x="1500" y="1330" width="260" height="120" rx="14" fill="#f6f6f6" stroke="#e6e6e6"></rect>
+            <text x="1630" y="1396" font-size="16" text-anchor="middle" fill="#596a6e">Dugout</text>
           </g>
 
-          <!-- outfield / position labels -->
+          <!-- Outfield position labels moved outward into outfield and sized for legibility -->
           <g id="positions" fill="#fff" font-weight="700" text-anchor="middle">
-            <text x="800" y="220" font-size="26">Center Fielder</text>
-            <text x="600" y="320" font-size="22">Left Fielder</text>
-            <text x="1000" y="320" font-size="22">Right Fielder</text>
+            <text x="900" y="320" font-size="28">Center Fielder</text>
+            <text x="650" y="420" font-size="24">Left Fielder</text>
+            <text x="1150" y="420" font-size="24">Right Fielder</text>
           </g>
 
-          <!-- infield labels removed duplicates; keep succinct -->
-          <g id="infieldLabels" fill="#0b3b40" text-anchor="middle">
-            <text x="800" y="680" font-size="18">Pitcher</text>
-            <text x="800" y="1160" font-size="18">Catcher</text>
+          <!-- Infield labels moved closer to bases and colored white for contrast -->
+          <g id="infieldLabels" fill="#fff" text-anchor="middle">
+            <text id="pitcherLabel" x="900" y="760" font-size="18">Pitcher</text>
+            <text id="catcherLabel" x="900" y="1516" font-size="18">Catcher</text>
           </g>
         </svg>
 
@@ -230,16 +221,16 @@
   </div>
 
 <script>
-  // Interactive mapping and info content (updated selectors to match new IDs)
+  // Interactive mapping and info content
   const descriptions = {
     home: {title:'Home Plate', text:'Where batters stand and where runs are scored. Shape helps umpires judge the strike zone.'},
-    first: {title:'First Base', text:'The first bag a runner reaches; frequent play target for throws.'},
-    second: {title:'Second Base', text:'Top corner of the diamond; pivot for many double plays.'},
-    third: {title:'Third Base', text:'Left corner; often called the hot corner.'},
-    mound: {title:"Pitcher's Plate", text:"A narrow white plate on the mound; visualized here shorter in height for clarity."},
-    shortstop: {title:"Shortstop", text:"Positioned between second and third, slightly behind second; key infield defender."},
-    infield: {title:"Infield", text:"The dirt area linking the bases where ground balls and quick throws occur."},
-    outfield: {title:"Outfield", text:"The grassy area beyond the baselines, divided into left, center, and right field."}
+    first: {title:'First Base', text:'First base bag. Fielders often try to make plays here.'},
+    second: {title:'Second Base', text:'Second base; common pivot for double plays.'},
+    third: {title:'Third Base', text:'Third base; commonly called the hot corner.'},
+    mound: {title:"Pitcher's Plate", text:"Narrow white plate on the mound; shortened and visually thicker per request."},
+    shortstop: {title:"Shortstop", text:"Between second and third, slightly behind second; key infield defender."},
+    infield: {title:"Infield", text:"Dirt area connecting the bases."},
+    outfield: {title:"Outfield", text:"Grassy area beyond the baselines."}
   };
 
   const primary = ['home','first','second','third','mound','shortstop','infield','outfield'];
@@ -290,7 +281,7 @@
     } else {
       const svg = document.getElementById('fieldSVG');
       const r = svg.getBoundingClientRect();
-      x = r.left + r.width*0.70;
+      x = r.left + r.width*0.72;
       y = r.top + r.height*0.36;
     }
     infoCard.style.left = Math.max(12, x) + 'px';
