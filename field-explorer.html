@@ -242,3 +242,118 @@
         <div class="base" id="home-plate" onclick="showInfo(event, 'home')"></div>
         <div class="base" id="first-base" onclick="showInfo(event, 'first')"></div>
         <div class="base" id="second-base" onclick="showInfo(event, 'second')">
+          <div class="base" id="third-base" onclick="showInfo(event, 'third')"></div>
+        
+        <!-- Pitcher's Mound -->
+        <div class="pitchers-mound" onclick="showInfo(event, 'mound')"></div>
+        
+        <!-- Outfield Areas -->
+        <div class="outfield-area outfield-left" onclick="showInfo(event, 'leftfield')"></div>
+        <div class="outfield-area outfield-center" onclick="showInfo(event, 'centerfield')"></div>
+        <div class="outfield-area outfield-right" onclick="showInfo(event, 'rightfield')"></div>
+      </div>
+    </div>
+    
+    <div class="progress-tracker">
+      <p>Areas discovered: <span id="discovered-count">0</span> of 8</p>
+    </div>
+  </div>
+
+  <!-- Info Card (hidden by default) -->
+  <div class="info-card" id="info-card">
+    <span class="close-btn" onclick="hideInfo()">×</span>
+    <h3 id="info-title">Title</h3>
+    <p id="info-text">Description</p>
+  </div>
+
+  <script>
+    const discovered = new Set();
+    
+    const fieldInfo = {
+      home: {
+        title: "Home Plate",
+        text: "This is where batters stand to hit. It's shaped like a house to help umpires see the strike zone. Runners must touch home plate to score a run!"
+      },
+      first: {
+        title: "First Base",
+        text: "The first stop on a batter's journey around the bases. Most plays happen here as fielders try to get runners out before they reach it."
+      },
+      second: {
+        title: "Second Base",
+        text: "The middle base, often called 'scoring position' because runners here have a good chance to score on a hit."
+      },
+      third: {
+        title: "Third Base",
+        text: "The last base before home. Also called the 'hot corner' because balls hit here come fast and hard!"
+      },
+      mound: {
+        title: "Pitcher's Mound",
+        text: "The raised dirt circle where the pitcher stands. It's exactly 60 feet, 6 inches from home plate."
+      },
+      infield: {
+        title: "The Infield",
+        text: "The dirt area connecting all the bases. This is where most of the action happens, with quick plays and split-second decisions."
+      },
+      leftfield: {
+        title: "Left Field",
+        text: "The grassy area beyond third base. Left fielders need strong arms to throw all the way to first base."
+      },
+      centerfield: {
+        title: "Center Field",
+        text: "The deepest part of the field. Center fielders cover the most ground and are often the fastest players."
+      },
+      rightfield: {
+        title: "Right Field",
+        text: "The area beyond first base. Right fielders need accurate arms to throw out runners heading to third base."
+      }
+    };
+    
+    function showInfo(event, area) {
+      event.stopPropagation();
+      
+      const info = fieldInfo[area];
+      if (!info) return;
+      
+      document.getElementById('info-title').textContent = info.title;
+      document.getElementById('info-text').textContent = info.text;
+      
+      const card = document.getElementById('info-card');
+      card.style.display = 'block';
+      card.style.left = event.pageX + 'px';
+      card.style.top = event.pageY + 'px';
+      
+      // Adjust position if card goes off screen
+      const rect = card.getBoundingClientRect();
+      if (rect.right > window.innerWidth) {
+        card.style.left = (event.pageX - rect.width) + 'px';
+      }
+      if (rect.bottom > window.innerHeight) {
+        card.style.top = (event.pageY - rect.height) + 'px';
+      }
+      
+      // Track discovery
+      if (!discovered.has(area)) {
+        discovered.add(area);
+        document.getElementById('discovered-count').textContent = discovered.size;
+        if (discovered.size === 8) {
+          setTimeout(() => {
+            alert("Congratulations! You've explored the entire field!");
+          }, 500);
+        }
+      }
+    }
+    
+    function hideInfo() {
+      document.getElementById('info-card').style.display = 'none';
+    }
+    
+    // Close card when clicking elsewhere
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.info-card') && !event.target.closest('[onclick]')) {
+        hideInfo();
+      }
+    });
+  </script>
+</body>
+</html>
+Just paste this right after line 120 in your file. Th
