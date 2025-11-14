@@ -1,361 +1,494 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Baseball Field Explorer - Discover the Diamond</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      font-family: Georgia, serif;
-      background: #87CEEB;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    
-    .container {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 900px;
-      width: 100%;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-    }
-    
-    h1 {
-      color: #0D3C55;
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 2.5em;
-    }
-    
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 30px;
-      font-style: italic;
-    }
-    
-    .field-container {
-      position: relative;
-      width: 100%;
-      max-width: 700px;
-      margin: 0 auto;
-      background: linear-gradient(to bottom, #8FBC8F 0%, #228B22 100%);
-      border-radius: 15px;
-      padding: 40px;
-      box-shadow: inset 0 5px 20px rgba(0,0,0,0.2);
-    }
-    
-    .field {
-      position: relative;
-      width: 100%;
-      padding-bottom: 100%;
-    }
-    
-    .diamond {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 45%;
-      height: 45%;
-      transform: translate(-50%, -50%) rotate(45deg);
-      background: #8B6914;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .diamond:hover {
-      box-shadow: 0 0 30px rgba(255,255,255,0.8);
-    }
-    
-    .base {
-      position: absolute;
-      width: 60px;
-      height: 60px;
-      background: white;
-      border: 3px solid #333;
-      cursor: pointer;
-      transition: all 0.3s;
-      z-index: 10;
-    }
-    
-    .base:hover {
-      transform: scale(1.2);
-      box-shadow: 0 0 20px rgba(255,215,0,0.8);
-    }
-    
-    #home-plate {
-      bottom: -30px;
-      right: -30px;
-      width: 70px;
-      height: 70px;
-      background: white;
-      clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
-    }
-    
-    #first-base { top: -30px; right: -30px; }
-    #second-base { top: -30px; left: -30px; }
-    #third-base { bottom: -30px; left: -30px; }
-    
-    .pitchers-mound {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 80px;
-      height: 80px;
-      background: #8B6914;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      transition: all 0.3s;
-      z-index: 5;
-      border: 3px solid #654321;
-    }
-    
-    .pitchers-mound:hover {
-      transform: translate(-50%, -50%) scale(1.1);
-      box-shadow: 0 0 25px rgba(255,255,255,0.6);
-    }
-    
-    .outfield-area {
-      position: absolute;
-      cursor: pointer;
-      opacity: 0;
-      transition: all 0.3s;
-    }
-    
-    .outfield-area:hover {
-      opacity: 0.3;
-      background: rgba(255,255,255,0.3);
-    }
-    
-    .outfield-left {
-      top: 0;
-      left: 0;
-      width: 33%;
-      height: 40%;
-    }
-    
-    .outfield-center {
-      top: 0;
-      left: 33%;
-      width: 34%;
-      height: 40%;
-    }
-    
-    .outfield-right {
-      top: 0;
-      right: 0;
-      width: 33%;
-      height: 40%;
-    }
-    
-    .info-card {
-      position: absolute;
-      background: white;
-      border: 3px solid #0D3C55;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 250px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      display: none;
-      z-index: 100;
-      animation: popIn 0.3s ease-out;
-    }
-    
-    @keyframes popIn {
-      from {
-        transform: scale(0.8);
-        opacity: 0;
-      }
-      to {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-    
-    .info-card h3 {
-      color: #0D3C55;
-      margin-bottom: 10px;
-      font-size: 1.3em;
-    }
-    
-    .info-card p {
-      color: #666;
-      line-height: 1.5;
-    }
-    
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 25px;
-      height: 25px;
-      border: 2px solid #0D3C55;
-      border-radius: 50%;
-      background: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: #0D3C55;
-    }
-    
-    .close-btn:hover {
-      background: #0D3C55;
-      color: white;
-    }
-    
-    .progress-tracker {
-      margin-top: 30px;
-      text-align: center;
-      color: #666;
-    }
-    
-    .discovered {
-      color: #28a745;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Field Explorer — Part A</title>
+<style>
+  :root{
+    --bg:#e9f6fb;
+    --stadium-outer:#0f3b4a;
+    --grass-1:#2e8b57;
+    --grass-2:#2ca552;
+    --dirt:#c49a5a;
+    --white:#ffffff;
+    --card-bg:#ffffff;
+    --accent:#ffb400;
+    --text:#10232a;
+    --muted:#556b72;
+    --card-border:rgba(10,30,40,0.08);
+    --shadow: 0 10px 30px rgba(10,30,40,0.12);
+    --max-width:980px;
+  }
+
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,var(--bg),#d7eef8 50%);
+    color:var(--text);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:28px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:var(--max-width);
+    background:linear-gradient(180deg,var(--card-bg),#fbffff);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    padding:20px;
+    box-sizing:border-box;
+  }
+
+  header{display:flex;align-items:center;gap:16px;padding:8px 6px 18px;border-bottom:1px solid #e6f0f4;margin-bottom:18px}
+  .title{
+    font-size:20px;
+    font-weight:700;
+    color:var(--stadium-outer);
+  }
+  .subtitle{color:var(--muted);font-size:13px;margin-top:4px}
+
+  .stage{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  /* SVG container */
+  .field-panel{
+    flex:1 1 640px;
+    min-width:320px;
+    background: linear-gradient(180deg,#e6fbf0 0%,#e6fbf0 40%, #cfeee0 100%);
+    border-radius:10px;
+    padding:14px;
+    box-sizing:border-box;
+    position:relative;
+  }
+
+  /* right sidebar */
+  .side{
+    width:300px;
+    min-width:240px;
+    box-sizing:border-box;
+  }
+
+  .panel{
+    background:#fff;
+    border-radius:10px;
+    padding:12px;
+    box-shadow:0 6px 18px rgba(8,20,25,0.06);
+    border:1px solid var(--card-border);
+  }
+
+  .legend{display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--muted)}
+  .legend-item{display:flex;gap:12px;align-items:center}
+  .swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,0.06)}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* Progress */
+  .progress{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .progress .count{font-weight:700;color:var(--stadium-outer)}
+  .progress .hint{font-size:13px;color:var(--muted)}
+
+  /* Info card */
+  .info-card{
+    position: absolute;
+    z-index: 30;
+    min-width:220px;
+    max-width:260px;
+    background:var(--card-bg);
+    border-radius:10px;
+    padding:12px 12px 14px;
+    box-shadow:0 12px 30px rgba(8,20,25,0.12);
+    border:1px solid var(--card-border);
+    display:none;
+  }
+  .info-card h3{margin:0 0 6px;font-size:15px;color:var(--stadium-outer)}
+  .info-card p{margin:0;font-size:13px;color:var(--muted);line-height:1.3}
+  .info-card .more{margin-top:8px;font-size:12px;color:var(--accent);font-weight:600;cursor:pointer}
+
+  .close-x{position:absolute;right:8px;top:10px;font-size:14px;color:var(--muted);cursor:pointer}
+
+  /* small celebratory badge */
+  .done-badge{
+    display:none;
+    margin-top:12px;
+    padding:10px;
+    border-radius:10px;
+    background:linear-gradient(90deg,#fff7e6,#fff2dc);
+    border:1px solid rgba(0,0,0,0.04);
+    color:#8a5a00;font-weight:700;font-size:13px;
+  }
+
+  /* responsive: keep SVG square */
+  .field-svg{
+    width:100%;
+    height:auto;
+    display:block;
+    max-width:900px;
+  }
+
+  /* focus styles for hotspots */
+  .hotspot{
+    outline:none;
+    cursor:pointer;
+  }
+  .hotspot:focus{ filter: drop-shadow(0 6px 18px rgba(0,0,0,0.12)); }
+  .hotspot:hover{filter:brightness(1.03) saturate(1.02);}
+
+  /* small helper text */
+  .tip{font-size:13px;color:var(--muted);margin-top:8px}
+  @media (max-width:880px){
+    .stage{flex-direction:column-reverse}
+    .side{width:100%}
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Baseball Field Explorer</h1>
-    <p class="subtitle">Click anywhere on the field to discover what each area is called!</p>
-    
-    <div class="field-container">
-      <div class="field">
-        <!-- Infield Diamond -->
-        <div class="diamond" onclick="showInfo(event, 'infield')"></div>
-        
-        <!-- Bases -->
-        <div class="base" id="home-plate" onclick="showInfo(event, 'home')"></div>
-        <div class="base" id="first-base" onclick="showInfo(event, 'first')"></div>
-        <div class="base" id="second-base" onclick="showInfo(event, 'second')">
-          </div>
-        <div class="base" id="third-base" onclick="showInfo(event, 'third')"></div>
-        
-        <!-- Pitcher's Mound -->
-        <div class="pitchers-mound" onclick="showInfo(event, 'mound')"></div>
-        
-        <!-- Outfield Areas -->
-        <div class="outfield-area outfield-left" onclick="showInfo(event, 'leftfield')"></div>
-        <div class="outfield-area outfield-center" onclick="showInfo(event, 'centerfield')"></div>
-        <div class="outfield-area outfield-right" onclick="showInfo(event, 'rightfield')"></div>
+  <div class="wrap" role="main">
+    <header>
+      <div>
+        <div class="title">Baseball Field Explorer</div>
+        <div class="subtitle">Explore the diamond: click or tap areas to learn their names and roles.</div>
       </div>
-    </div>
-    
-    <div class="progress-tracker">
-      <p>Areas discovered: <span id="discovered-count">0</span> of 8</p>
+    </header>
+
+    <div class="stage">
+      <section class="field-panel panel" aria-labelledby="field-title">
+        <h2 id="field-title" style="display:none">Baseball Field</h2>
+
+        <!-- Info card (absolute) -->
+        <div id="infoCard" class="info-card" role="dialog" aria-hidden="true">
+          <span class="close-x" id="cardClose" tabindex="0" aria-label="Close info">✕</span>
+          <h3 id="infoTitle">Title</h3>
+          <p id="infoBody">Description</p>
+          <div class="more" id="infoMore" tabindex="0" role="button">Learn more</div>
+        </div>
+
+        <!-- Field SVG: realistic proportions, basepaths, mound, fence arc -->
+        <svg id="fieldSVG" class="field-svg" viewBox="0 0 1200 900" role="img" aria-label="Baseball field diagram">
+          <defs>
+            <!-- grass stripes -->
+            <linearGradient id="ggrass" x1="0" x2="1">
+              <stop offset="0" stop-color="#2e8b57"/>
+              <stop offset="1" stop-color="#2ca552"/>
+            </linearGradient>
+
+            <radialGradient id="dirtGrad" cx="50%" cy="30%">
+              <stop offset="0%" stop-color="#d3a66f"/>
+              <stop offset="100%" stop-color="#c49a5a"/>
+            </radialGradient>
+
+            <filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="8" stdDeviation="18" flood-color="#0a1a22" flood-opacity="0.12"/>
+            </filter>
+          </defs>
+
+          <!-- stadium outer backdrop -->
+          <rect x="0" y="0" width="1200" height="900" fill="url(#ggrass)"/>
+
+          <!-- outfield fence arc (visual only) -->
+          <path d="M120 520 A500 500 0 0 1 1080 520 L1080 540 A520 520 0 0 0 120 540 Z"
+                fill="#0b3b47" opacity="0.12"/>
+
+          <!-- warning track -->
+          <path d="M120 520 A500 500 0 0 1 1080 520 L1080 540 A520 520 0 0 0 120 540 Z"
+                fill="#e7d3b7" opacity="0.6"/>
+
+          <!-- fair grass (approx) as polygon; infield/diamond will sit on top -->
+          <ellipse cx="600" cy="520" rx="420" ry="300" fill="url(#ggrass)" opacity="1"/>
+
+          <!-- infield dirt arc -->
+          <path d="M600 340 C750 340 900 420 1000 520 L200 520 C300 420 450 340 600 340 Z"
+                fill="url(#dirtGrad)" filter="url(#softShadow)" opacity="0.98"/>
+
+          <!-- basepath square (rotated diamond) centered near bottom-left area -->
+          <!-- We'll draw the diamond centered around (600,420) to approximate home area -->
+          <!-- Draw base bags -->
+          <g id="bases" transform="translate(600,420)">
+            <!-- base positions relative to center -->
+            <!-- home plate drawn separately -->
+            <!-- first base -->
+            <rect id="firstBase" class="hotspot" x="140" y="-110" width="38" height="38" rx="4" fill="#fff"
+                  stroke="#c6c6c6" stroke-width="3" tabindex="0" role="button" aria-label="First base"/>
+            <!-- second base -->
+            <rect id="secondBase" class="hotspot" x="-3" y="-254" width="38" height="38" rx="4" fill="#fff"
+                  stroke="#c6c6c6" stroke-width="3" tabindex="0" role="button" aria-label="Second base" />
+            <!-- third base -->
+            <rect id="thirdBase" class="hotspot" x="-146" y="-110" width="38" height="38" rx="4" fill="#fff"
+                  stroke="#c6c6c6" stroke-width="3" tabindex="0" role="button" aria-label="Third base" />
+            <!-- home plate: use polygon for shape -->
+            <polygon id="homePlate" class="hotspot" points="220,40 180,40 180,0 200,-20 220,0" fill="#fff"
+                     transform="translate(-220,170) rotate(0)" stroke="#c6c6c6" stroke-width="3"
+                     tabindex="0" role="button" aria-label="Home plate"/>
+            <!-- pitcher's mound (circle) -->
+            <circle id="mound" class="hotspot" cx="0" cy="-60" r="34" fill="#bb8f5a" stroke="#a0663c" stroke-width="3"
+                    tabindex="0" role="button" aria-label="Pitcher's mound"/>
+            <!-- infield grass edge ring (visual) -->
+            <circle cx="0" cy="-60" r="220" fill="none" stroke="#7aa06f" stroke-width="10" opacity="0.02"/>
+          </g>
+
+          <!-- foul lines -->
+          <line x1="600" y1="420" x2="200" y2="740" stroke="#fff" stroke-width="2" stroke-dasharray="2 4" opacity="0.9"/>
+          <line x1="600" y1="420" x2="1000" y2="740" stroke="#fff" stroke-width="2" stroke-dasharray="2 4" opacity="0.9"/>
+
+          <!-- outfield labels (for visual guidance) -->
+          <g id="outfieldLabels" font-family="Arial" font-size="18" fill="#ffffff" opacity="0.95" text-anchor="middle">
+            <text x="600" y="120" fill="#ffffff" font-weight="700">CENTER FIELD</text>
+            <text x="360" y="160" fill="#ffffff" font-weight="600">LEFT FIELD</text>
+            <text x="840" y="160" fill="#ffffff" font-weight="600">RIGHT FIELD</text>
+          </g>
+
+          <!-- create invisible hotspot shapes for outfield zones (left/center/right and infield) -->
+          <g id="hotspotsOutfield" transform="translate(0,0)">
+            <!-- left field -->
+            <path id="leftField" class="hotspot" d="M120 520 A500 500 0 0 1 420 360 L360 200 L240 380 Z" fill="rgba(255,255,255,0.0001)"
+                  tabindex="0" role="button" aria-label="Left field"/>
+            <!-- center field -->
+            <path id="centerField" class="hotspot" d="M420 360 A300 300 0 0 1 780 360 L700 200 L500 190 Z" fill="rgba(255,255,255,0.0001)"
+                  tabindex="0" role="button" aria-label="Center field"/>
+            <!-- right field -->
+            <path id="rightField" class="hotspot" d="M780 360 A500 500 0 0 1 1080 520 L960 380 L840 200 Z" fill="rgba(255,255,255,0.0001)"
+                  tabindex="0" role="button" aria-label="Right field"/>
+          </g>
+
+          <!-- infield hotspot (dirt area) -->
+          <path id="infieldHot" class="hotspot" d="M200 520 C300 420 450 340 600 340 C750 340 900 420 1000 520 L600 800 Z"
+                fill="rgba(255,255,255,0.0001)" tabindex="0" role="button" aria-label="Infield"/>
+
+          <!-- optional coach boxes, dugouts, on-deck (visual markers, not interactive) -->
+          <rect x="80" y="620" width="120" height="50" rx="8" fill="#f6f6f6" opacity="0.85" stroke="#e6e6e6"/>
+          <text x="140" y="650" font-size="12" fill="#596a6e" text-anchor="middle">Dugout</text>
+
+          <rect x="1000" y="620" width="120" height="50" rx="8" fill="#f6f6f6" opacity="0.85" stroke="#e6e6e6"/>
+          <text x="1060" y="650" font-size="12" fill="#596a6e" text-anchor="middle">Dugout</text>
+
+        </svg>
+
+        <div style="margin-top:12px" class="tip">Tip: Use Tab to focus hotspots, then press Enter or Space to open details.</div>
+      </section>
+
+      <aside class="side">
+        <div class="panel" aria-labelledby="legend-title">
+          <h3 id="legend-title" style="margin:0 0 8px 0">Legend & Progress</h3>
+          <div class="progress">
+            <div>
+              <div class="muted">Discovered</div>
+              <div class="count"><span id="foundCount">0</span> / <span id="totalCount">8</span></div>
+            </div>
+            <div>
+              <div style="font-size:13px;color:var(--muted)">Completion</div>
+            </div>
+          </div>
+
+          <div class="legend" aria-hidden="false">
+            <div class="legend-item"><div class="swatch" style="background:var(--grass-1)"></div><div>Outfield / Grass</div></div>
+            <div class="legend-item"><div class="swatch" style="background:var(--dirt)"></div><div>Infield / Dirt</div></div>
+            <div class="legend-item"><div class="swatch" style="background:var(--white)"></div><div>Bases & Home Plate</div></div>
+            <div class="legend-item"><div class="swatch" style="background:var(--accent)"></div><div>Info cards</div></div>
+          </div>
+
+          <div class="done-badge" id="doneBadge">All areas discovered — nice work!</div>
+          <div style="margin-top:10px" class="muted">This explorer is safe to embed in Canvas via iframe. Use it before the First Pitch quiz to let learners freely explore the field.</div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="panel" aria-labelledby="areas-title" style="margin-top:12px">
+          <h4 id="areas-title" style="margin:0 0 8px 0">Areas (click to open)</h4>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="panel-btn hotspot" data-area="home" type="button">Home Plate</button>
+            <button class="panel-btn hotspot" data-area="first" type="button">First Base</button>
+            <button class="panel-btn hotspot" data-area="second" type="button">Second Base</button>
+            <button class="panel-btn hotspot" data-area="third" type="button">Third Base</button>
+            <button class="panel-btn hotspot" data-area="mound" type="button">Pitcher's Mound</button>
+            <button class="panel-btn hotspot" data-area="infield" type="button">Infield</button>
+            <button class="panel-btn hotspot" data-area="leftfield" type="button">Left Field</button>
+            <button class="panel-btn hotspot" data-area="centerfield" type="button">Center Field</button>
+            <button class="panel-btn hotspot" data-area="rightfield" type="button">Right Field</button>
+          </div>
+        </div>
+
+      </aside>
     </div>
   </div>
 
-  <!-- Info Card (hidden by default) -->
-  <div class="info-card" id="info-card">
-    <span class="close-btn" onclick="hideInfo()">×</span>
-    <h3 id="info-title">Title</h3>
-    <p id="info-text">Description</p>
-  </div>
+<script>
+  // Part A: data and basic interactivity
+  const info = {
+    home: {
+      title: "Home Plate",
+      body: "Where the batter stands to hit and where runners must touch to score. Its shape helps umpires judge the strike zone.",
+    },
+    first: {
+      title: "First Base",
+      body: "The first base a batter runs to after hitting. Fielders often attempt plays here to get runners out.",
+    },
+    second: {
+      title: "Second Base",
+      body: "The middle base on the right side of the diamond. Key for force plays and double plays.",
+    },
+    third: {
+      title: "Third Base",
+      body: "The final base before home. Often called the 'hot corner' due to the number of hard-hit balls.",
+    },
+    mound: {
+      title: "Pitcher's Mound",
+      body: "The raised area where the pitcher throws from. It's 60 feet, 6 inches from the rear point of home plate in standard fields.",
+    },
+    infield: {
+      title: "Infield",
+      body: "The dirt and grass area around the bases where most quick plays occur: ground balls, throws, and double plays.",
+    },
+    leftfield: {
+      title: "Left Field",
+      body: "Outfield area beyond third base. Left fielders often need strong arms to throw to third base.",
+    },
+    centerfield: {
+      title: "Center Field",
+      body: "Deepest outfield area. Center fielders cover a lot of ground and often act as the outfield leader.",
+    },
+    rightfield: {
+      title: "Right Field",
+      body: "Outfield area beyond first base. Right fielders need strong, accurate throws to third base.",
+    }
+  };
 
-  <script>
-    const discovered = new Set();
-    
-    const fieldInfo = {
-      home: {
-        title: "Home Plate",
-        text: "This is where batters stand to hit. It's shaped like a house to help umpires see the strike zone. Runners must touch home plate to score a run!"
-      },
-      first: {
-        title: "First Base",
-        text: "The first stop on a batter's journey around the bases. Most plays happen here as fielders try to get runners out before they reach it."
-      },
-      second: {
-        title: "Second Base",
-        text: "The middle base, often called 'scoring position' because runners here have a good chance to score on a hit."
-      },
-      third: {
-        title: "Third Base",
-        text: "The last base before home. Also called the 'hot corner' because balls hit here come fast and hard!"
-      },
-      mound: {
-        title: "Pitcher's Mound",
-        text: "The raised dirt circle where the pitcher stands. It's exactly 60 feet, 6 inches from home plate."
-      },
-      infield: {
-        title: "The Infield",
-        text: "The dirt area connecting all the bases. This is where most of the action happens, with quick plays and split-second decisions."
-      },
-      leftfield: {
-        title: "Left Field",
-        text: "The grassy area beyond third base. Left fielders need strong arms to throw all the way to first base."
-      },
-      centerfield: {
-        title: "Center Field",
-        text: "The deepest part of the field. Center fielders cover the most ground and are often the fastest players."
-      },
-      rightfield: {
-        title: "Right Field",
-        text: "The area beyond first base. Right fielders need accurate arms to throw out runners heading to third base."
+  const areas = ["home","first","second","third","mound","infield","leftfield","centerfield","rightfield"];
+  // We'll count 8 primary discoveries; some panels list 9 buttons (keeps flexible)
+  const discoverSet = new Set();
+
+  // map svg elements / buttons
+  function $(sel){ return document.querySelector(sel); }
+  function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
+
+  const infoCard = $("#infoCard");
+  const infoTitle = $("#infoTitle");
+  const infoBody = $("#infoBody");
+  const infoMore = $("#infoMore");
+  const cardClose = $("#cardClose");
+  const foundCount = $("#foundCount");
+  const totalCount = $("#totalCount");
+  const doneBadge = $("#doneBadge");
+
+  // set totals (we consider 8 unique areas for progress: home,first,second,third,mound,infield,leftfield,centerfield,rightfield)
+  totalCount.textContent = 8;
+
+  // helper: show card near event target (SVG-aware)
+  function showCard(area, evt){
+    const entry = info[area];
+    if(!entry) return;
+    infoTitle.textContent = entry.title;
+    infoBody.textContent = entry.body;
+    infoMore.style.display = 'none';
+    infoCard.style.display = 'block';
+    infoCard.setAttribute('aria-hidden','false');
+
+    // compute position: prefer near mouse/touch or near SVG bounding box if keyboard-invoked
+    let pageX = (evt && evt.clientX) ? evt.clientX : (window.innerWidth/2);
+    let pageY = (evt && evt.clientY) ? evt.clientY : (window.innerHeight/2);
+
+    // offset so card isn't directly under pointer
+    pageX += 14; pageY += 6;
+
+    // set initial left/top
+    infoCard.style.left = pageX + 'px';
+    infoCard.style.top = pageY + 'px';
+
+    // ensure card within viewport
+    requestAnimationFrame(()=>{
+      const rect = infoCard.getBoundingClientRect();
+      const pad = 12;
+      if(rect.right > window.innerWidth - pad){
+        infoCard.style.left = (window.innerWidth - rect.width - pad) + 'px';
       }
-    };
-    
-    function showInfo(event, area) {
-      event.stopPropagation();
-      
-      const info = fieldInfo[area];
-      if (!info) return;
-      
-      document.getElementById('info-title').textContent = info.title;
-      document.getElementById('info-text').textContent = info.text;
-      
-      const card = document.getElementById('info-card');
-      card.style.display = 'block';
-      card.style.left = event.pageX + 'px';
-      card.style.top = event.pageY + 'px';
-      
-      // Adjust position if card goes off screen
-      const rect = card.getBoundingClientRect();
-      if (rect.right > window.innerWidth) {
-        card.style.left = (event.pageX - rect.width) + 'px';
-      }
-      if (rect.bottom > window.innerHeight) {
-        card.style.top = (event.pageY - rect.height) + 'px';
-      }
-      
-      // Track discovery
-      if (!discovered.has(area)) {
-        discovered.add(area);
-        document.getElementById('discovered-count').textContent = discovered.size;
-        if (discovered.size === 8) {
-          setTimeout(() => {
-            alert("Congratulations! You've explored the entire field!");
-          }, 500);
-        }
-      }
-    }
-    
-    function hideInfo() {
-      document.getElementById('info-card').style.display = 'none';
-    }
-    
-    // Close card when clicking elsewhere
-    document.addEventListener('click', function(event) {
-      if (!event.target.closest('.info-card') && !event.target.closest('[onclick]')) {
-        hideInfo();
+      if(rect.bottom > window.innerHeight - pad){
+        infoCard.style.top = (window.innerHeight - rect.height - pad) + 'px';
       }
     });
-  </script>
+
+    // track discovery (count unique). We'll consider 8 primary: home,first,second,third,mound,infield,leftfield,centerfield
+    const primary = ["home","first","second","third","mound","infield","leftfield","centerfield"];
+    if(primary.includes(area) && !discoverSet.has(area)){
+      discoverSet.add(area);
+      foundCount.textContent = discoverSet.size;
+      if(discoverSet.size >= primary.length){
+        doneBadge.style.display = 'block';
+        setTimeout(()=>doneBadge.style.transform = 'translateY(-2px)',120);
+      }
+    }
+  }
+
+  // close handler
+  function hideCard(){
+    infoCard.style.display = 'none';
+    infoCard.setAttribute('aria-hidden','true');
+  }
+
+  // wire interactive SVG hotspots
+  const map = {
+    home: ["#homePlate",".panel-btn[data-area='home']"],
+    first: ["#firstBase",".panel-btn[data-area='first']"],
+    second: ["#secondBase",".panel-btn[data-area='second']"],
+    third: ["#thirdBase",".panel-btn[data-area='third']"],
+    mound: ["#mound",".panel-btn[data-area='mound']"],
+    infield: ["#infieldHot",".panel-btn[data-area='infield']"],
+    leftfield: ["#leftField",".panel-btn[data-area='leftfield']"],
+    centerfield: ["#centerField",".panel-btn[data-area='centerfield']"],
+    rightfield: ["#rightField",".panel-btn[data-area='rightfield']"]
+  };
+
+  // attach listeners for SVG elements and sidebar buttons
+  Object.keys(map).forEach(area=>{
+    const [svgSel, btnSel] = map[area];
+    const svgEl = document.querySelector(svgSel);
+    const btnEl = document.querySelector(btnSel);
+
+    if(svgEl){
+      svgEl.addEventListener('click', (ev)=>{ ev.stopPropagation(); showCard(area, ev); });
+      svgEl.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); showCard(area, ev); }});
+      // mouseover highlight
+      svgEl.addEventListener('mouseenter', ()=> svgEl.style.opacity = 0.95 );
+      svgEl.addEventListener('mouseleave', ()=> svgEl.style.opacity = 1 );
+    }
+    if(btnEl){
+      btnEl.addEventListener('click', (ev)=>{ showCard(area, ev); });
+      btnEl.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' ') { ev.preventDefault(); showCard(area, ev); }});
+    }
+  });
+
+  // close via the x
+  cardClose.addEventListener('click', hideCard);
+  cardClose.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter' || ev.key===' ') hideCard(); });
+
+  // hide card if clicking outside
+  document.addEventListener('click', (ev)=>{
+    const isHot = ev.target.closest('.hotspot') || ev.target.closest('.info-card') || ev.target.closest('.panel-btn');
+    if(!isHot) hideCard();
+  });
+
+  // keyboard: Esc to close
+  document.addEventListener('keydown', (ev)=>{
+    if(ev.key === 'Escape') hideCard();
+  });
+
+  // ensure svg hotspots are focusable (some browsers need tabindex set on <path>/<rect>)
+  // already set via tabindex="0" in the SVG markup above.
+
+  // small responsive tweak to center card if mobile (no pointer coords)
+  window.addEventListener('resize', ()=> { if(infoCard.style.display === 'block'){ /* reposition if needed */ }});
+</script>
 </body>
 </html>
-
-          
