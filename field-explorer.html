@@ -325,3 +325,342 @@
 </script>
 </body>
 </html>
+Next steps
+
+Paste this file into field-explorer.html in your repo and commit. Then test the iframe inside Canvas.
+
+Tell me any fine adjustments you want (shift diamond slightly down/up, make bases larger, change label text, add batter boxes, or tune colors toward a T‑Mobile Park feel). I’ll produce Part B (textures and subtle scuffs, grass striping, better mound dirt texture, anchored info-card pointers, and a lightweight confetti completion) once you confirm Part A layout is visually correct.
+
+We are getting there. The diamond is elongated rather than equal distances from base to base to base. It is too small for me to see the features, so it will definitely need to be 3-5 times bigger. Make the pitchers mound a circle rather than an oval, and make the pitchers base or bag, or whatever it is called maube one third shorter than it is. I will need the picture enlarged as requested before I can provide any more feedback. Do you understand how I am describing this? I want to be as helpful to you to get this right as I can be.
+See my thinking
+I understand exactly. I rebuilt the SVG so the diamond is much larger (about 3× previous size), bases and baselines are clearer, the pitcher's mound is a circle, and the pitcher's plate is a narrow white rectangle roughly one‑third shorter in height than before. All hotspots, labels, coach boxes, on‑deck circles, dugouts, and the discovery tracker remain accessible and keyboard operable.
+
+Paste this single HTML file into field-explorer.html (replace the previous file). It scales responsively, embeds in Canvas via your iframe, and is ready for Part B visual polish after you confirm layout and sizing.
+
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Field Explorer — Enlarged Diamond, Circular Mound</title>
+<style>
+  :root{
+    --bg:#eaf8ff;
+    --grass-dark:#245f3a;
+    --grass-light:#2e8b57;
+    --dirt-1:#d6a770;
+    --dirt-2:#c28f4f;
+    --base-white:#ffffff;
+    --muted:#51686c;
+    --accent:#faad33;
+    --stroke:#0b3940;
+    --card-bg:#ffffff;
+    --max-w:1200px;
+  }
+  html,body{height:100%;margin:0}
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,var(--bg), #d9eff8 60%);
+    display:flex;justify-content:center;padding:20px;color:var(--stroke);
+  }
+  .wrap{width:100%;max-width:var(--max-w);background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(6,30,40,0.12);padding:18px;box-sizing:border-box}
+  header{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+  h1{margin:0;font-size:20px}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
+  .layout{display:flex;gap:18px;flex-wrap:wrap}
+  .field{flex:1 1 820px;min-width:360px;background:linear-gradient(180deg,#e9fbef,#dff6eb);padding:10px;border-radius:10px;position:relative}
+  .side{width:320px;min-width:260px}
+  .panel{background:#fff;border-radius:10px;padding:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(6,30,40,0.04)}
+  svg{width:100%;height:auto;display:block}
+  .info{position:absolute;z-index:50;min-width:240px;background:var(--card-bg);border-radius:10px;padding:12px;box-shadow:0 12px 30px rgba(6,30,40,0.12);border:1px solid rgba(6,30,40,0.06);display:none}
+  .info h3{margin:0 0 8px;font-size:15px;color:var(--stroke)}
+  .info p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
+  .info .close{position:absolute;right:8px;top:8px;cursor:pointer;color:var(--muted)}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:8px}
+  .sw{width:14px;height:14px;border-radius:3px}
+  .tip{font-size:13px;color:var(--muted);margin-top:10px}
+  .btn-list button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid rgba(6,30,40,0.04);background:#fff;margin-bottom:8px;cursor:pointer}
+  .btn-list button:focus{outline:2px solid rgba(43,122,87,0.12)}
+  @media (max-width:880px){.layout{flex-direction:column-reverse}.side{width:100%}}
+</style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <div>
+        <h1>Field Explorer — Enlarged Diamond</h1>
+        <div class="subtitle">Diamond enlarged for clarity, circular mound, and narrower pitcher plate (shorter height).</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="field panel" aria-label="Baseball field">
+        <!-- Info card -->
+        <div id="infoCard" class="info" role="dialog" aria-hidden="true">
+          <div class="close" id="cardClose" tabindex="0" aria-label="Close">✕</div>
+          <h3 id="infoTitle">Title</h3>
+          <p id="infoBody">Description</p>
+        </div>
+
+        <!-- SVG field -->
+        <svg id="fieldSVG" viewBox="0 0 1400 1100" role="img" aria-label="Baseball field diagram">
+          <defs>
+            <linearGradient id="gGrass" x1="0" x2="1">
+              <stop offset="0" stop-color="var(--grass-light)"/>
+              <stop offset="1" stop-color="var(--grass-dark)"/>
+            </linearGradient>
+            <radialGradient id="dirtR" cx="50%" cy="35%">
+              <stop offset="0%" stop-color="#e2b887"/>
+              <stop offset="100%" stop-color="#c79b59"/>
+            </radialGradient>
+            <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#0a1a22" flood-opacity="0.12"/></filter>
+          </defs>
+
+          <!-- full grass -->
+          <rect x="0" y="0" width="1400" height="1100" fill="url(#gGrass)"/>
+
+          <!-- warning track / outfield arc -->
+          <path d="M120 160 A600 600 0 0 1 1280 160 L1280 210 A620 620 0 0 0 120 210 Z" fill="#d9c0a0" opacity="0.6"/>
+
+          <!-- foul lines -->
+          <line id="foulRight" x1="700" y1="920" x2="1300" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+          <line id="foulLeft" x1="700" y1="920" x2="100" y2="40" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+          <line x1="700" y1="920" x2="1300" y2="40" stroke="#f7ead7" stroke-width="2" stroke-dasharray="7 4" opacity="0.6"/>
+          <line x1="700" y1="920" x2="100" y2="40" stroke="#f7ead7" stroke-width="2" stroke-dasharray="7 4" opacity="0.6"/>
+
+          <!-- big diamond group: center at (700,560), base radius ~360 (much larger) -->
+          <g id="diamond" transform="translate(700,560)">
+            <!-- scaled diamond (rotated square) -->
+            <path id="infieldDirt" d="M0 -360 L260 0 L0 360 L-260 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2" filter="url(#soft)"/>
+
+            <!-- baselines painted white (thicker, clearly visible) -->
+            <path d="M0 -360 L260 0" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+            <path d="M260 0 L0 360" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+            <path d="M0 360 L-260 0" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+            <path d="M-260 0 L0 -360" stroke="#fff" stroke-width="12" stroke-linecap="round"/>
+
+            <!-- thin chalk inner edges -->
+            <path d="M0 -360 L260 0" stroke="#f4e6cf" stroke-width="3" opacity="0.85"/>
+            <path d="M260 0 L0 360" stroke="#f4e6cf" stroke-width="3" opacity="0.85"/>
+            <path d="M0 360 L-260 0" stroke="#f4e6cf" stroke-width="3" opacity="0.85"/>
+            <path d="M-260 0 L0 -360" stroke="#f4e6cf" stroke-width="3" opacity="0.85"/>
+
+            <!-- Bases (bags) increased size for clarity: 60x60 -->
+            <g id="firstGroup" transform="translate(260,0)">
+              <rect id="firstBase" class="hotspot" x="-30" y="-30" width="60" height="60" rx="4" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="First base"></rect>
+              <text x="0" y="88" font-size="16" text-anchor="middle" fill="#0b3b40">First baseman</text>
+            </g>
+
+            <g id="secondGroup" transform="translate(0,-360)">
+              <rect id="secondBase" class="hotspot" x="-30" y="-30" width="60" height="60" rx="4" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Second base"></rect>
+              <text x="0" y="-90" font-size="16" text-anchor="middle" fill="#0b3b40">Second baseman</text>
+            </g>
+
+            <g id="thirdGroup" transform="translate(-260,0)">
+              <rect id="thirdBase" class="hotspot" x="-30" y="-30" width="60" height="60" rx="4" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Third base"></rect>
+              <text x="0" y="88" font-size="16" text-anchor="middle" fill="#0b3b40">Third baseman</text>
+            </g>
+
+            <!-- home plate: larger pentagon -->
+            <g id="homeGroup" transform="translate(0,360)">
+              <polygon id="homePlate" class="hotspot" points="-28,0 28,0 28,-20 0,-40 -28,-20" fill="#fff" stroke="#c6c6c6" stroke-width="3" tabindex="0" role="button" aria-label="Home plate"></polygon>
+              <text x="0" y="110" font-size="16" text-anchor="middle" fill="#0b3b40">Catcher</text>
+            </g>
+
+            <!-- pitcher's mound: CIRCULAR mound (now a circle) placed approx 60-70 units toward home from center -->
+            <g id="moundGroup" transform="translate(0,-120)">
+              <!-- circular mound -->
+              <circle id="moundCircle" cx="0" cy="0" r="48" fill="#b97f4f" stroke="#9b6237" stroke-width="3" filter="url(#soft)"></circle>
+              <!-- rectangular pitcher plate centered on mound, width same as base (60), height ~1/3 shorter (now 8) -->
+              <rect id="pitcherPlate" class="hotspot" x="-30" y="-6" width="60" height="8" rx="2" fill="#fff" stroke="#c6c6c6" stroke-width="2" tabindex="0" role="button" aria-label="Pitcher's plate"></rect>
+              <text x="0" y="78" font-size="16" text-anchor="middle" fill="#0b3b40">Pitcher</text>
+            </g>
+
+            <!-- shortstop between and slightly behind second and third -->
+            <g id="shortstopGroup" transform="translate(-140,-200)">
+              <circle id="shortstop" class="hotspot" r="16" fill="#fff" stroke="#c6c6c6" stroke-width="3" tabindex="0" role="button" aria-label="Shortstop"></circle>
+              <text x="0" y="44" font-size="14" text-anchor="middle" fill="#0b3b40">Shortstop</text>
+            </g>
+
+            <!-- faint axis for orientation -->
+            <line x1="0" y1="-420" x2="0" y2="420" stroke="#ffffff" stroke-width="1" opacity="0.06"/>
+          </g>
+
+          <!-- coach boxes (larger) just outside baselines near first and third -->
+          <g id="coachBoxes">
+            <rect id="coachFirst" x="980" y="560" width="96" height="36" rx="6" fill="#fff" stroke="#d9d9d9"></rect>
+            <text x="1028" y="584" font-size="13" text-anchor="middle" fill="#596a6e">Coach's box</text>
+
+            <rect id="coachThird" x="324" y="560" width="96" height="36" rx="6" fill="#fff" stroke="#d9d9d9"></rect>
+            <text x="372" y="584" font-size="13" text-anchor="middle" fill="#596a6e">Coach's box</text>
+          </g>
+
+          <!-- on-deck circles near dugouts (larger) -->
+          <g id="onDecks">
+            <circle cx="220" cy="880" r="22" fill="#fff" stroke="#d9d9d9"></circle>
+            <text x="220" y="918" font-size="12" text-anchor="middle" fill="#596a6e">On-deck</text>
+
+            <circle cx="1180" cy="880" r="22" fill="#fff" stroke="#d9d9d9"></circle>
+            <text x="1180" y="918" font-size="12" text-anchor="middle" fill="#596a6e">On-deck</text>
+          </g>
+
+          <!-- dugouts -->
+          <g id="dugouts">
+            <rect x="140" y="900" width="180" height="72" rx="10" fill="#f6f6f6" stroke="#e6e6e6"></rect>
+            <text x="230" y="946" font-size="13" text-anchor="middle" fill="#596a6e">Dugout</text>
+
+            <rect x="1080" y="900" width="180" height="72" rx="10" fill="#f6f6f6" stroke="#e6e6e6"></rect>
+            <text x="1170" y="946" font-size="13" text-anchor="middle" fill="#596a6e">Dugout</text>
+          </g>
+
+          <!-- outfield / position labels -->
+          <g id="positions" fill="#fff" font-weight="700" text-anchor="middle">
+            <text x="700" y="120" font-size="20">Center Fielder</text>
+            <text x="480" y="200" font-size="18">Left Fielder</text>
+            <text x="920" y="200" font-size="18">Right Fielder</text>
+          </g>
+
+          <!-- infield position labels -->
+          <g id="infieldLabels" fill="#0b3b40" text-anchor="middle">
+            <text x="700" y="640" font-size="16">Pitcher</text>
+            <text x="700" y="820" font-size="16">Catcher</text>
+          </g>
+        </svg>
+
+        <div class="tip">Tip: tab to hotspots (bases, pitcher's plate, shortstop) and press Enter/Space to open descriptions.</div>
+      </section>
+
+      <aside class="side">
+        <div class="panel" aria-labelledby="legendTitle">
+          <h3 id="legendTitle" style="margin:0 0 8px 0">Legend & Controls</h3>
+
+          <div class="legend-item"><div class="sw" style="background:var(--grass-light)"></div><div>Outfield / Grass</div></div>
+          <div class="legend-item"><div class="sw" style="background:var(--dirt-1)"></div><div>Infield / Dirt</div></div>
+
+          <div style="margin:10px 0" class="btn-list" role="group" aria-label="Area buttons">
+            <button data-area="home">Home plate</button>
+            <button data-area="first">First base</button>
+            <button data-area="second">Second base</button>
+            <button data-area="third">Third base</button>
+            <button data-area="mound">Pitcher's plate</button>
+            <button data-area="shortstop">Shortstop</button>
+            <button data-area="infield">Infield</button>
+            <button data-area="outfield">Outfield</button>
+          </div>
+
+          <div style="margin-top:6px;color:var(--muted);font-size:13px">Discover areas by clicking or tabbing then pressing Enter. Progress shown below.</div>
+          <div style="margin-top:12px;font-weight:700;font-size:18px;color:var(--stroke)"><span id="foundCount">0</span> / <span id="totalCount">8</span></div>
+          <div id="complete" style="display:none;margin-top:10px;padding:8px;border-radius:8px;background:linear-gradient(90deg,#fff7e6,#fff2dc);color:#8a5a00">All areas discovered — nice!</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+  // Interactive mapping and info content
+  const descriptions = {
+    home: {title:'Home Plate', text:'Where batters stand and runs are scored. Shape helps umpires judge the strike zone.'},
+    first: {title:'First Base', text:'The first bag a runner reaches; frequent play target for throws.'},
+    second: {title:'Second Base', text:'Top corner of the diamond; pivot for many double plays.'},
+    third: {title:'Third Base', text:'Left corner; often called the hot corner.'},
+    mound: {title:"Pitcher's Plate", text:"A narrow white plate on the mound; visualized here shorter in height for clarity."},
+    shortstop: {title:"Shortstop", text:"Positioned between second and third, slightly behind second; key infield defender."},
+    infield: {title:"Infield", text:"The dirt area linking the bases where ground balls and quick throws happen."},
+    outfield: {title:"Outfield", text:"The grassy area beyond the baselines divided into left, center, and right field."}
+  };
+
+  const primary = ['home','first','second','third','mound','shortstop','infield','outfield'];
+  const found = new Set();
+
+  // mapping selectors
+  const mapping = {
+    home: ['#homePlate','button[data-area="home"]'],
+    first: ['#firstBase','button[data-area="first"]'],
+    second: ['#secondBase','button[data-area="second"]'],
+    third: ['#thirdBase','button[data-area="third"]'],
+    mound: ['#pitcherPlate','button[data-area="mound"]'],
+    shortstop: ['#shortstop','button[data-area="shortstop"]'],
+    infield: ['#infieldDirt','button[data-area="infield"]'],
+    outfield: ['#fieldSVG','button[data-area="outfield"]']
+  };
+
+  const infoCard = document.getElementById('infoCard');
+  const infoTitle = document.getElementById('infoTitle');
+  const infoBody = document.getElementById('infoBody');
+  const cardClose = document.getElementById('cardClose');
+  const foundCount = document.getElementById('foundCount');
+  const totalCount = document.getElementById('totalCount');
+  totalCount.textContent = primary.length;
+
+  function showCard(area, ev){
+    const data = descriptions[area];
+    if(!data) return;
+    infoTitle.textContent = data.title;
+    infoBody.textContent = data.text;
+    infoCard.style.display = 'block';
+    infoCard.setAttribute('aria-hidden','false');
+
+    // discovery tracking
+    if(primary.includes(area) && !found.has(area)){
+      found.add(area);
+      foundCount.textContent = found.size;
+      if(found.size === primary.length){
+        document.getElementById('complete').style.display = 'block';
+      }
+    }
+
+    // position near event or element
+    let x=window.innerWidth/2, y=window.innerHeight/2;
+    if(ev && ev.clientX){
+      x = ev.clientX + 12;
+      y = ev.clientY + 6;
+    } else {
+      const svg = document.getElementById('fieldSVG');
+      const r = svg.getBoundingClientRect();
+      x = r.left + r.width*0.70;
+      y = r.top + r.height*0.36;
+    }
+    infoCard.style.left = Math.max(12, x) + 'px';
+    infoCard.style.top = Math.max(12, y) + 'px';
+
+    // clamp to viewport
+    requestAnimationFrame(()=>{
+      const rect = infoCard.getBoundingClientRect(), pad=12;
+      if(rect.right > window.innerWidth - pad) infoCard.style.left = (window.innerWidth - rect.width - pad) + 'px';
+      if(rect.bottom > window.innerHeight - pad) infoCard.style.top = (window.innerHeight - rect.height - pad) + 'px';
+    });
+  }
+
+  function hideCard(){ infoCard.style.display='none'; infoCard.setAttribute('aria-hidden','true'); }
+
+  // wire interactions
+  Object.keys(mapping).forEach(area=>{
+    const [selSvg, selBtn] = mapping[area];
+    const svgEl = document.querySelector(selSvg);
+    const btnEl = document.querySelector(selBtn);
+    if(svgEl){
+      svgEl.addEventListener('click', (e)=>{ e.stopPropagation(); showCard(area,e); });
+      svgEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); showCard(area,e); }});
+    }
+    if(btnEl){
+      btnEl.addEventListener('click', (e)=>{ showCard(area,e); });
+      btnEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); showCard(area,e); }});
+    }
+  });
+
+  // close handlers
+  cardClose.addEventListener('click', hideCard);
+  cardClose.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') hideCard(); });
+
+  document.addEventListener('click', (e)=>{
+    const isHot = e.target.closest('.hotspot') || e.target.closest('.panel') || e.target.closest('.info');
+    if(!isHot) hideCard();
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideCard(); });
+
+  // Ensure SVG elements with tabindex exist for keyboard focus
+  window.addEventListener('resize', ()=>{ if(infoCard.style.display==='block'){} });
+</script>
+</body>
+</html>
