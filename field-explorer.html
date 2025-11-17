@@ -3,17 +3,11 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Baseball Field Explorer — Dev Grid</title>
+<title>Baseball Field Explorer — Dev Grid (updated)</title>
 <style>
   :root{
-    --grass-dark:#214f31;
-    --grass-light:#2f8c57;
-    --dirt-1:#d6a770;
-    --dirt-2:#c28f4f;
-    --chalk:#ffffff;
-    --chalk-soft:#f7ead7;
-    --stroke:#0b3940;
-    --grid-color:#0d3c55;
+    --grass-dark:#214f31; --grass-light:#2f8c57; --dirt-1:#d6a770; --dirt-2:#c28f4f;
+    --chalk:#ffffff; --chalk-soft:#f7ead7; --stroke:#0b3940; --grid-color:#0d3c55;
   }
   html,body{height:100%;margin:0}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f4fbf7;color:#13353a;display:flex;justify-content:center;padding:16px}
@@ -32,7 +26,6 @@
   .controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
   .btn{background:#0d3c55;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px;border:none;cursor:pointer}
   .btn.secondary{background:#e9f7ef;color:#0d3c55}
-  /* Small responsive tweak for checklist area */
   @media (max-width:700px) {
     #quizWrap{flex-direction:column}
     #quizChecklist{width:100%;border-left:none;padding-left:0;margin-top:10px}
@@ -41,11 +34,10 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Baseball Field Explorer — Dev Grid</h1>
-    <div class="subtitle">Use grid references (e.g., C5, A6, G6, C5.5) to direct placement. Remove the grid when layout is locked.</div>
+    <h1>Baseball Field Explorer — Dev Grid (updated)</h1>
+    <div class="subtitle">Clickable outfield boxes added for the quiz; foul lines aligned to baselines.</div>
 
     <div class="panel" id="panel">
-      <!-- Info card -->
       <div id="infoCard" class="infoCard" role="dialog" aria-hidden="true">
         <div class="closeBtn" id="cardClose" tabindex="0" aria-label="Close info">✕</div>
         <h3 id="cardTitle">Title</h3>
@@ -67,7 +59,7 @@
         <!-- Background -->
         <rect x="0" y="0" width="1800" height="2400" fill="url(#gGrass)"/>
 
-        <!-- Outfield / warning track (slightly extended compared to original) -->
+        <!-- Outfield / warning track -->
         <path id="warningTrack" d="M120 280 A1078 1078 0 0 1 1680 280 L1680 350 A1100 1100 0 0 0 120 350 Z"
               fill="#d9c0a0" opacity="0.55"/>
 
@@ -83,7 +75,7 @@
 
         <!-- Diamond group centered -->
         <g id="diamondRoot" transform="translate(900,900)">
-          <!-- Infield dirt (diamond corners at +/-720 units from center per your doc) -->
+          <!-- Infield dirt (diamond corners per your doc: 720) -->
           <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
 
           <!-- Baselines (infield chalk) -->
@@ -92,12 +84,7 @@
           <path id="baseline_2_3"     d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
           <path id="baseline_3_home"  d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
 
-          <!-- Foul lines (underlay) - local coords so they follow diamondRoot; 1.1× extension -->
-          <!-- local home point is (0,720) in this group -->
-          <line id="foulRight" x1="900" y1="1620" x2="1764"  y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none" />
-          <line id="foulLeft"  x1="900" y1="1620" x2="36" y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none" />
-
-          <!-- Bases (bags) with labels (drawn after foul lines so they sit on top) -->
+          <!-- Bases (drawn before placing foul lines so we can compute corner coords if needed) -->
           <g id="firstBaseGroup" transform="translate(720,0)">
             <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
                   fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
@@ -123,7 +110,7 @@
                      tabindex="0" role="button" aria-label="Home plate"/>
           </g>
 
-          <!-- Mound group: translated per your doc -->
+          <!-- Mound group -->
           <g id="moundGroup" transform="translate(0,100)" aria-label="Pitcher's mound">
             <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
             <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
@@ -131,7 +118,29 @@
           </g>
         </g>
 
-        <!-- Coach boxes (kept outside diamondRoot; coordinates are canvas-space) -->
+        <!-- Foul lines corrected to start at base corners and extend to canvas edges (absolute canvas coordinates) -->
+        <!-- Calculation notes: first base top-right corner canvas = (960,840); extend along baseline vector to right edge => endpoint (1800,0) -->
+        <line id="foulRight" x1="960" y1="840" x2="1800" y2="0" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
+
+        <!-- third base top-left corner canvas = (120,840); extend along baseline vector to left edge => endpoint (0,720) -->
+        <line id="foulLeft"  x1="120" y1="840" x2="0" y2="720" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
+
+        <!-- Outfield clickable boxes (replace text labels). These are absolute canvas coords -->
+        <!-- Left Field box centered near previous LF label (approx x=640,y=560) -->
+        <g id="outfieldBoxes" aria-hidden="false">
+          <rect id="lfBox" x="560" y="530" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Left Field"/>
+          <text x="640" y="570" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Left Field</text>
+
+          <!-- Center Field -->
+          <rect id="cfBox" x="820" y="320" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Center Field"/>
+          <text x="900" y="360" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Center Field</text>
+
+          <!-- Right Field -->
+          <rect id="rfBox" x="1040" y="530" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Right Field"/>
+          <text x="1120" y="570" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Right Field</text>
+        </g>
+
+        <!-- Coach boxes, on-deck, and dev grid remain (unchanged) -->
         <g id="coachBoxes">
           <g id="coach1" transform="translate(1520,1050) rotate(315)">
             <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
@@ -143,22 +152,14 @@
           </g>
         </g>
 
-        <!-- On-deck circles with black centered labels -->
         <g id="onDecks">
           <circle id="onDeckLeft"  cx="280"  cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text   id="onDeckLeftLabel" x="280" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
+          <text id="onDeckLeftLabel" x="280" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
           <circle id="onDeckRight" cx="1520" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text   id="onDeckRightLabel" x="1520" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
+          <text id="onDeckRightLabel" x="1520" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
         </g>
 
-        <!-- Outfield labels -->
-        <g id="outfieldLabels" fill="#fff" font-weight="700" text-anchor="middle">
-          <text id="cfLabel" x="900"  y="50" font-size="26">Center Fielder</text>
-          <text id="lfLabel" x="280"  y="250" font-size="26">Left Fielder</text>
-          <text id="rfLabel" x="1520" y="250" font-size="26">Right Fielder</text>
-        </g>
-
-        <!-- DEV GRID OVERLAY -->
+        <!-- DEV GRID -->
         <g id="devGrid" stroke="#0d3c55" stroke-width="1" opacity="0.45" fill="#0d3c55" font-family="Arial,Helvetica,sans-serif">
           <g id="gridColumns">
             <line x1="200" x2="200" y1="0" y2="1700"/><text class="gridLabel" x="196" y="28">A</text>
@@ -178,7 +179,6 @@
             <line x1="1300" x2="1300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
             <line x1="1500" x2="1500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
           </g>
-
           <g id="gridRows">
             <line x1="0" x2="1800" y1="200" y2="200"/><text class="gridLabel" x="24" y="206">1</text>
             <line x1="0" x2="1800" y1="400" y2="400"/><text class="gridLabel" x="24" y="406">2</text>
@@ -207,7 +207,7 @@
 
       </svg>
 
-      <div class="legend">Legend: Use grid references like <strong>C5</strong> (column C, row 5) or half‑steps like <strong>C5.5</strong>. When layout is final, click <em>Remove Grid</em>.</div>
+      <div class="legend">Legend: Outfield boxes are clickable for the quiz. When layout is final, click <em>Remove Grid</em>.</div>
 
       <div class="controls" style="margin-top:12px;">
         <button class="btn" id="removeGridBtn">Remove Grid</button>
@@ -235,17 +235,22 @@
   </div>
 
 <script>
-  // Basic mapping for hotspots and their info text
+  // Info mapping (now includes outfield boxes)
   const info = {
     'firstBase': {title:'First Base', text:'The first base bag. Click to read more.'},
     'secondBase': {title:'Second Base', text:'Second base is at the top of the diamond.'},
     'thirdBase': {title:'Third Base', text:'Third base is the third corner of the diamond.'},
     'homePlate': {title:'Home Plate', text:'Home plate is where batters stand and runs are scored.'},
     'pitcherPlate': {title:"Pitcher's Plate", text:'The white rectangle on the mound where the pitcher throws from.'},
-    'moundCircle': {title:"Pitcher’s Mound", text:'The circular raised mound near the center of the infield.'}
+    'moundCircle': {title:"Pitcher’s Mound", text:'The circular raised mound near the center of the infield.'},
+    'lfBox': {title:'Left Field', text:'Left field area; click to learn more.'},
+    'cfBox': {title:'Center Field', text:'Center field area; click to learn more.'},
+    'rfBox': {title:'Right Field', text:'Right field area; click to learn more.'},
+    'onDeckLeft': {title:'On-deck (Left)', text:'On-deck circle left.'},
+    'onDeckRight': {title:'On-deck (Right)', text:'On-deck circle right.'}
   };
 
-  // Attach click/keyboard handlers for elements with IDs matching the info keys
+  // Attach info card handlers
   Object.keys(info).forEach(key=>{
     const el = document.getElementById(key);
     if(!el) return;
@@ -268,16 +273,13 @@
     cardBody.textContent = body;
     card.style.display = 'block';
     card.setAttribute('aria-hidden','false');
-    // position within panel bounds
     const panelRect = document.getElementById('panel').getBoundingClientRect();
     const left = Math.min(Math.max(16, x - panelRect.left + 8), panelRect.width - 280);
     const top  = Math.min(Math.max(16, y - panelRect.top + 8), panelRect.height - 120);
     card.style.left = left + 'px';
     card.style.top  = top + 'px';
   }
-
   function hideCard(){ card.style.display = 'none'; card.setAttribute('aria-hidden','true'); }
-
   cardClose.addEventListener('click', hideCard);
   cardClose.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' ') hideCard(); });
 
@@ -286,37 +288,26 @@
     const inside = ev.target.closest('.infoCard') || ev.target.closest('.hotspot') || ev.target.closest('.panel');
     if(!inside) hideCard();
   });
-
   document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') hideCard(); });
 
-  // Remove grid button
-  document.getElementById('removeGridBtn').addEventListener('click', ()=>{
-    removeDevGrid();
-  });
-  document.getElementById('resetBtn').addEventListener('click', ()=>{
-    location.reload();
-  });
+  // Remove grid / reset
+  document.getElementById('removeGridBtn').addEventListener('click', ()=>{ removeDevGrid(); });
+  document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
+  function removeDevGrid(){ const g = document.getElementById('devGrid'); if(g) g.parentNode.removeChild(g); }
 
-  function removeDevGrid(){
-    const g = document.getElementById('devGrid');
-    if(g) g.parentNode.removeChild(g);
-  }
-
-  // convertGridRef('C5') helper (keeps your earlier logic)
+  // convertGridRef helper (keeps your earlier logic)
   function convertGridRef(ref){
     const match = String(ref).toUpperCase().match(/^([A-H])(\d(?:\.\d)?)$/);
     if(!match) return null;
     const col = match[1];
     const row = parseFloat(match[2]);
-    const colIndex = col.charCodeAt(0) - 65; // A=0..H=7
+    const colIndex = col.charCodeAt(0) - 65;
     const xFinal = 200 + colIndex*200 + ( (ref.includes('.5')) ? 100 : 0 );
     const yFinal = row * 200;
     return {x: xFinal, y: yFinal};
   }
 
-  // =======================
-  // Quiz module (non-graded)
-  // =======================
+  // ===== Quiz module (non-graded) with outfield boxes included =====
   (function(){
     const PARTS = [
       {id:'homePlate', name:'Home Plate'},
@@ -325,7 +316,10 @@
       {id:'thirdBase', name:'Third Base'},
       {id:'moundCircle', name:"Pitcher's Mound"},
       {id:'onDeckLeft', name:'On-deck Left'},
-      {id:'onDeckRight', name:'On-deck Right'}
+      {id:'onDeckRight', name:'On-deck Right'},
+      {id:'lfBox', name:'Left Field'},
+      {id:'cfBox', name:'Center Field'},
+      {id:'rfBox', name:'Right Field'}
     ];
 
     const startBtn = document.getElementById('quizStartBtn');
@@ -470,7 +464,7 @@
     window._fieldExplorer.resetQuiz = resetQuiz;
   })();
 
-  // Accessibility: allow remove grid via keyboard (focus on button)
+  // Keyboard shortcut to remove grid (Ctrl+G)
   document.addEventListener('keydown', (ev)=>{
     if(ev.key==='g' && ev.ctrlKey){
       const g = document.getElementById('devGrid');
@@ -480,6 +474,7 @@
 </script>
 </body>
 </html>
+
 
 
 
