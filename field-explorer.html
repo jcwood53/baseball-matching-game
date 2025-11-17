@@ -3,334 +3,243 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Field Explorer — Final Layout Update</title>
+<title>Baseball Field Explorer — Dev Grid</title>
 <style>
-:root{
-  --bg:#eaf8ff;
-  --grass-dark:#214f31;
-  --grass-light:#2f8c57;
-  --dirt-1:#d6a770;
-  --dirt-2:#c28f4f;
-  --base-white:#ffffff;
-  --muted:#51686c;
-  --accent:#faad33;
-  --stroke:#0b3940;
-  --card-bg:#ffffff;
-  --max-w:1600px;
-}
-html,body{height:100%;margin:0}
-body{
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  background: linear-gradient(180deg,var(--bg), #d9eff8 60%);
-  display:flex;justify-content:center;padding:16px;color:var(--stroke);
-}
-.wrap{width:100%;max-width:var(--max-w);background:#fff;border-radius:12px;box-shadow:0 12px 36px rgba(6,30,40,0.12);padding:16px;box-sizing:border-box}
-header{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
-h1{margin:0;font-size:20px}
-.subtitle{color:var(--muted);font-size:13px;margin-top:6px}
-.layout{display:flex;gap:14px;flex-wrap:wrap}
-.field{flex:1 1 920px;min-width:360px;background:linear-gradient(180deg,#e9fbef,#dff6eb);padding:10px;border-radius:10px;position:relative}
-.side{width:320px;min-width:260px}
-.panel{background:#fff;border-radius:10px;padding:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(6,30,40,0.04)}
-svg{width:100%;height:auto;display:block}
-.info{position:absolute;z-index:50;min-width:240px;background:var(--card-bg);border-radius:10px;padding:12px;box-shadow:0 12px 30px rgba(6,30,40,0.12);border:1px solid rgba(6,30,40,0.06);display:none}
-.info h3{margin:0 0 8px;font-size:15px;color:var(--stroke)}
-.info p{margin:0;color:var(--muted);font-size:13px;line-height:1.35}
-.info .close{position:absolute;right:8px;top:8px;cursor:pointer;color:var(--muted)}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:8px}
-.sw{width:14px;height:14px;border-radius:3px}
-.tip{font-size:13px;color:var(--muted);margin-top:10px}
-.btn-list button{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:8px;border:1px solid rgba(6,30,40,0.04);background:#fff;margin-bottom:8px;cursor:pointer}
-.btn-list button:focus{outline:2px solid rgba(43,122,87,0.12)}
-@media (max-width:880px){.layout{flex-direction:column-reverse}.side{width:100%}}
+  :root{
+    --grass-dark:#214f31;
+    --grass-light:#2f8c57;
+    --dirt-1:#d6a770;
+    --dirt-2:#c28f4f;
+    --chalk:#fff;
+    --chalk-soft:#f7ead7;
+    --stroke:#0b3940;
+  }
+  html,body{height:100%;margin:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f4fbf7;color:#13353a;display:flex;justify-content:center;padding:16px}
+  .wrap{width:100%;max-width:1200px;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(10,25,30,0.12);padding:14px}
+  h1{margin:0 0 6px 0;font-size:20px}
+  .subtitle{color:#61777b;font-size:13px;margin-bottom:10px}
+  .panel{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px}
+  svg{width:100%;height:auto;display:block}
+  .info{position:absolute;background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 12px 30px rgba(10,25,30,0.12);border-radius:10px;padding:10px;min-width:240px;display:none;z-index:10}
+  .info h3{margin:0 0 6px 0;font-size:15px}
+  .info p{margin:0;font-size:13px;color:#61777b}
+  .close{position:absolute;right:8px;top:8px;cursor:pointer;color:#61777b}
+  .legend{font-size:13px;color:#61777b;margin-top:8px}
+  .hotspot:focus{outline:3px solid rgba(47,140,87,0.25)}
 </style>
 </head>
 <body>
-<div class="wrap" role="main">
-  <header>
-    <div>
-      <h1>Field Explorer — Final Layout Update</h1>
-      <div class="subtitle">Proportions adjusted: foul lines follow baselines; outfield deeper; labels and boxes repositioned.</div>
-    </div>
-  </header>
+  <div class="wrap">
+    <h1>Baseball Field Explorer — Dev Grid</h1>
+    <div class="subtitle">Use grid references (e.g., C5, A6, G6) to direct precise placement. We’ll remove the grid after layout is locked.</div>
 
-  <div class="layout">
-    <section class="field panel" aria-label="Baseball field">
-      <div id="infoCard" class="info" role="dialog" aria-hidden="true">
-        <div class="close" id="cardClose" tabindex="0" aria-label="Close">✕</div>
-        <h3 id="infoTitle">Title</h3>
-        <p id="infoBody">Description</p>
+    <div class="panel" style="position:relative">
+      <div id="card" class="info" role="dialog" aria-hidden="true">
+        <div id="cardClose" class="close" tabindex="0" aria-label="Close">✕</div>
+        <h3 id="cardTitle">Title</h3>
+        <p id="cardBody">Description</p>
       </div>
 
-      <!-- SVG field -->
-      <svg id="fieldSVG" viewBox="0 0 1800 1700" role="img" aria-label="Baseball field diagram">
+      <!-- SVG: viewBox units chosen so grid spacing feels intuitive -->
+      <svg id="fieldSVG" viewBox="0 0 1800 1700" role="img" aria-label="Baseball field diagram with development grid">
         <defs>
           <linearGradient id="gGrass" x1="0" x2="1">
             <stop offset="0" stop-color="var(--grass-light)"/>
             <stop offset="1" stop-color="var(--grass-dark)"/>
           </linearGradient>
-          <radialGradient id="dirtR" cx="50%" cy="35%">
+          <radialGradient id="dirtR" cx="50%" cy="40%">
             <stop offset="0%" stop-color="#e2b887"/>
             <stop offset="100%" stop-color="#c79b59"/>
           </radialGradient>
-          <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#0a1a22" flood-opacity="0.12"/></filter>
         </defs>
 
-        <!-- background/grass scaled deeper to match infield -->
+        <!-- Background grass -->
         <rect x="0" y="0" width="1800" height="1700" fill="url(#gGrass)"/>
 
-        <!-- deeper outfield arc and warning track -->
-        <path d="M100 260 A960 960 0 0 1 1700 260 L1700 340 A980 980 0 0 0 100 340 Z" fill="#d9c0a0" opacity="0.56"/>
+        <!-- Deeper outfield arc / warning track (edit R/depth by adjusting A values) -->
+        <path id="warningTrack" d="M120 280 A980 980 0 0 1 1680 280 L1680 350 A1000 1000 0 0 0 120 350 Z"
+              fill="#d9c0a0" opacity="0.55"/>
 
-        <!-- Diamond center at (900,900). Diamond is a perfect rotated square. R (corner distance) = 720 -->
+        <!-- Diamond root: center at (900,900); rotated square as perfect diamond -->
         <g id="diamondRoot" transform="translate(900,900)">
-          <!-- perfect square rotated = diamond -->
-          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2" filter="url(#soft)"/>
+          <!-- Infield dirt as rotated square (corner radius ~720) -->
+          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z"
+                fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
 
-          <!-- baselines (painted) -->
-          <path id="base1" d="M0 -720 L720 0" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
-          <path id="base2" d="M720 0 L0 720" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
-          <path id="base3" d="M0 720 L-720 0" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
-          <path id="base4" d="M-720 0 L0 -720" stroke="#fff" stroke-width="16" stroke-linecap="round"/>
+          <!-- Baselines (painted chalk) -->
+          <path id="baseline_H_to_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_1_to_2" d="M720 0 L0 720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_2_to_3" d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_3_to_H" d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
 
-          <!-- chalk inner edges -->
-          <path d="M0 -720 L720 0" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
-          <path d="M720 0 L0 720" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
-          <path d="M0 720 L-720 0" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
-          <path d="M-720 0 L0 -720" stroke="#f4e6cf" stroke-width="4" opacity="0.8"/>
-
-          <!-- Bases sized and positioned at diamond corners. Labels placed ON the bags as 1B/2B/3B in black -->
-          <g id="firstGroup" transform="translate(720,0)">
-            <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"></rect>
-            <text id="label1b" x="0" y="6" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
+          <!-- Bases with labels ON bags (black) -->
+          <g id="firstBaseGroup" transform="translate(720,0)">
+            <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
+            <text id="label1B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
+          </g>
+          <g id="secondBaseGroup" transform="translate(0,-720)">
+            <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"/>
+            <text id="label2B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
+          </g>
+          <g id="thirdBaseGroup" transform="translate(-720,0)">
+            <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"/>
+            <text id="label3B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
           </g>
 
-          <g id="secondGroup" transform="translate(0,-720)">
-            <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"></rect>
-            <text id="label2b" x="0" y="6" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
-          </g>
-
-          <g id="thirdGroup" transform="translate(-720,0)">
-            <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"></rect>
-            <text id="label3b" x="0" y="6" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
-          </g>
-
-          <!-- Home plate rotated 180 degrees (point oriented correctly) -->
+          <!-- Home plate rotated 180° -->
           <g id="homeGroup" transform="translate(0,720) rotate(180)">
-            <polygon id="homePlate" class="hotspot" points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Home plate"></polygon>
+            <polygon id="homePlate" class="hotspot"
+                     points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4"
+                     tabindex="0" role="button" aria-label="Home plate"/>
           </g>
 
-          <!-- Pitcher's mound: circular, moved slightly closer to home (translate y), mound bag shortened and thicker -->
+          <!-- Mound: circular; pitcher’s plate shorter and thicker -->
           <g id="moundGroup" transform="translate(0,-110)">
-            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6" filter="url(#soft)"></circle>
-            <!-- Pitcher's plate shortened vertically (height smaller) and stroke doubled for thickness -->
-            <!-- width = 120 (same as base width), height shortened to 10; stroke-width increased to 6 -->
-            <rect id="pitcherPlate" class="hotspot" x="-60" y="-5" width="120" height="10" rx="3" fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"></rect>
+            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"></circle>
+            <!-- width 120 (base width), height shorter; stroke thickened -->
+            <rect id="pitcherPlate" class="hotspot" x="-60" y="-5" width="120" height="10" rx="3"
+                  fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
           </g>
 
-          <!-- Shortstop between and slightly behind second and third -->
+          <!-- Shortstop example hotspot -->
           <g id="shortstopGroup" transform="translate(-210,-420)">
-            <circle id="shortstop" class="hotspot" r="30" fill="#fff" stroke="#c6c6c6" stroke-width="4" tabindex="0" role="button" aria-label="Shortstop"></circle>
+            <circle id="shortstop" class="hotspot" r="30" fill="#fff" stroke="#c6c6c6" stroke-width="4"
+                    tabindex="0" role="button" aria-label="Shortstop"/>
             <text x="0" y="84" font-size="20" text-anchor="middle" fill="#fff" font-weight="700">SS</text>
           </g>
-
-          <!-- center axis subtle -->
-          <line x1="0" y1="-820" x2="0" y2="820" stroke="#ffffff" stroke-width="1" opacity="0.04"/>
         </g>
 
-        <!-- Foul lines: start at home center and continue exactly along baseline vectors into outfield -->
-        <!-- Compute home center: diamond center (900,900) + bottom offset 720 => (900,1620) -->
-        <!-- Baseline vectors: from home toward first (vector to (900+720,900) => target direction). We'll extend far into outfield. -->
-        <line id="foulRight" x1="900" y1="1620" x2="1700" y2="240" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
-        <line id="foulLeft"  x1="900" y1="1620" x2="100"  y2="240" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
-        <!-- chalk edges -->
-        <line x1="900" y1="1620" x2="1700" y2="240" stroke="#f7ead7" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
-        <line x1="900" y1="1620" x2="100"  y2="240" stroke="#f7ead7" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
+        <!-- Foul lines: exact continuation of baseline vectors from home center -->
+        <!-- Home center = diamond center (900,900) + Y offset 720 => (900,1620) -->
+        <line id="foulRight" x1="900" y1="1620" x2="1700" y2="240" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <line id="foulLeft"  x1="900" y1="1620" x2="100"  y2="240" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <line x1="900" y1="1620" x2="1700" y2="240" stroke="var(--chalk-soft)" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
+        <line x1="900" y1="1620" x2="100"  y2="240" stroke="var(--chalk-soft)" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
 
-        <!-- Coach boxes rotated 90deg relative to previous (long edge parallel to baseline direction)
-             We'll place them just outside first and third, oriented so long edge runs roughly along baseline direction.
-             Using rotated rect groups for precise placement. -->
+        <!-- Coach boxes: place/rotate by grid references later -->
         <g id="coachBoxes">
-          <!-- First base coach box: place outside first base, rotated +90 deg so long edge follows baseline -->
-          <g transform="translate(900,900) translate(520,120) rotate(90)">
-            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"></rect>
-            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box</text>
+          <!-- First base coach box (initial placement near first baseline) -->
+          <g id="coach1" transform="translate(1420,1010) rotate(90)">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
+            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (1B)</text>
           </g>
-
-          <!-- Third base coach box: mirrored on left side -->
-          <g transform="translate(900,900) translate(-520,120) rotate(-90)">
-            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"></rect>
-            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box</text>
+          <!-- Third base coach box -->
+          <g id="coach3" transform="translate(380,1010) rotate(-90)">
+            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
+            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (3B)</text>
           </g>
         </g>
 
-        <!-- On-deck circles: aligned laterally with home plate center and moved ~SVG-scale ~40 units closer to home -->
+        <!-- On-deck circles: aligned laterally; easy to nudge -->
         <g id="onDecks">
-          <!-- left on-deck near left foul line but aligned laterally with home (x = 900 - 620) -->
-          <circle cx="280" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"></circle>
-          <text x="280" y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
-
-          <!-- right on-deck -->
-          <circle cx="1520" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"></circle>
-          <text x="1520" y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
+          <circle id="onDeckLeft"  cx="280"  cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
+          <text   x="280"  y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
+          <circle id="onDeckRight" cx="1520" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
+          <text   x="1520" y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
         </g>
 
-        <!-- Dugouts placed at bottom corners -->
-        <g id="dugouts">
-          <rect x="20" y="1560" width="260" height="120" rx="12" fill="#f6f6f6" stroke="#e6e6e6"></rect>
-          <text x="150" y="1622" font-size="16" text-anchor="middle" fill="#596a6e">Dugout</text>
-
-          <rect x="1520" y="1560" width="260" height="120" rx="12" fill="#f6f6f6" stroke="#e6e6e6"></rect>
-          <text x="1640" y="1622" font-size="16" text-anchor="middle" fill="#596a6e">Dugout</text>
+        <!-- Outfield position labels (mid/deep outfield) -->
+        <g id="outfieldLabels" fill="#fff" font-weight="700" text-anchor="middle">
+          <text id="cfLabel" x="900"  y="360" font-size="32">Center Fielder</text>
+          <text id="lfLabel" x="640"  y="560" font-size="26">Left Fielder</text>
+          <text id="rfLabel" x="1160" y="560" font-size="26">Right Fielder</text>
         </g>
 
-        <!-- Outfield labels moved into mid/deep outfield -->
-        <g id="positions" fill="#fff" font-weight="700" text-anchor="middle">
-          <text x="900" y="360" font-size="32">Center Fielder</text>
-          <text x="640" y="560" font-size="26">Left Fielder</text>
-          <text x="1160" y="560" font-size="26">Right Fielder</text>
-        </g>
-
-        <!-- Infield labels: pitcher and catcher placed for clarity (pitcher near mound, catcher near home) -->
-        <g id="infieldLabels" fill="#fff" text-anchor="middle">
-          <text id="pitcherLabel" x="900" y="800" font-size="20" font-weight="700">Pitcher</text>
-          <text id="catcherLabel" x="900" y="1648" font-size="20" font-weight="700">Catcher</text>
+        <!-- DEV GRID OVERLAY (temporary). Remove by deleting this <g id="devGrid"> block when done. -->
+        <g id="devGrid" stroke="#666" stroke-width="1" opacity="0.35" fill="#333" font-size="18">
+          <!-- Grid spacing: 200 units. Columns A–H at x=200..1600 -->
+          <!-- Vertical lines + column labels -->
+          <g id="gridCols">
+            <line x1="200" y1="0" x2="200" y2="1700"/><text x="196" y="28">A</text>
+            <line x1="400" y1="0" x2="400" y2="1700"/><text x="396" y="28">B</text>
+            <line x1="600" y1="0" x2="600" y2="1700"/><text x="596" y="28">C</text>
+            <line x1="800" y1="0" x2="800" y2="1700"/><text x="796" y="28">D</text>
+            <line x1="1000" y1="0" x2="1000" y2="1700"/><text x="996" y="28">E</text>
+            <line x1="1200" y1="0" x2="1200" y2="1700"/><text x="1196" y="28">F</text>
+            <line x1="1400" y1="0" x2="1400" y2="1700"/><text x="1396" y="28">G</text>
+            <line x1="1600" y1="0" x2="1600" y2="1700"/><text x="1596" y="28">H</text>
+          </g>
+          <!-- Horizontal lines + row labels (rows 1–8 at y=200..1600) -->
+          <g id="gridRows">
+            <line x1="0" y1="200" x2="1800" y2="200"/><text x="24" y="206">1</text>
+            <line x1="0" y1="400" x2="1800" y2="400"/><text x="24" y="406">2</text>
+            <line x1="0" y1="600" x2="1800" y2="600"/><text x="24" y="606">3</text>
+            <line x1="0" y1="800" x2="1800" y2="800"/><text x="24" y="806">4</text>
+            <line x1="0" y1="1000" x2="1800" y2="1000"/><text x="24" y="1006">5</text>
+            <line x1="0" y1="1200" x2="1800" y2="1200"/><text x="24" y="1206">6</text>
+            <line x1="0" y1="1400" x2="1800" y2="1400"/><text x="24" y="1406">7</text>
+            <line x1="0" y1="1600" x2="1800" y2="1600"/><text x="24" y="1606">8</text>
+          </g>
+          <!-- Optional subtle dots at intersections for easier visual targeting -->
+          <g id="gridDots" opacity="0.35">
+            <!-- Generate a few sample dots; we can add more if useful -->
+            <circle cx="600" cy="1000" r="3"/><!-- C5 -->
+            <circle cx="200" cy="1200" r="3"/><!-- A6 -->
+            <circle cx="1400" cy="1200" r="3"/><!-- G6 -->
+          </g>
         </g>
       </svg>
 
-      <div class="tip">Tip: Tab to hotspots (bases, pitcher's plate, shortstop) and press Enter/Space to open descriptions.</div>
-    </section>
-
-    <aside class="side">
-      <div class="panel" aria-labelledby="legendTitle">
-        <h3 id="legendTitle" style="margin:0 0 8px 0">Legend & Controls</h3>
-
-        <div class="legend-item"><div class="sw" style="background:var(--grass-light)"></div><div>Outfield / Grass</div></div>
-        <div class="legend-item"><div class="sw" style="background:var(--dirt-1)"></div><div>Infield / Dirt</div></div>
-
-        <div style="margin:10px 0" class="btn-list" role="group" aria-label="Area buttons">
-          <button data-area="home">Home plate</button>
-          <button data-area="first">First base</button>
-          <button data-area="second">Second base</button>
-          <button data-area="third">Third base</button>
-          <button data-area="mound">Pitcher's plate</button>
-          <button data-area="shortstop">Shortstop</button>
-          <button data-area="infield">Infield</button>
-          <button data-area="outfield">Outfield</button>
-        </div>
-
-        <div style="margin-top:6px;color:var(--muted);font-size:13px">Discover areas by clicking or tabbing then pressing Enter. Progress shown below.</div>
-        <div style="margin-top:12px;font-weight:700;font-size:18px;color:var(--stroke)"><span id="foundCount">0</span> / <span id="totalCount">8</span></div>
-        <div id="complete" style="display:none;margin-top:10px;padding:8px;border-radius:8px;background:linear-gradient(90deg,#fff7e6,#fff2dc);color:#8a5a00">All areas discovered — nice!</div>
-      </div>
-    </aside>
+      <div class="legend">Legend: Use grid references (e.g., C5) when requesting placement and rotation adjustments. We’ll remove the grid after final review.</div>
+    </div>
   </div>
-</div>
 
 <script>
-  // Interactive mapping and info content
+  // Info content and mapping
   const descriptions = {
-    home: {title:'Home Plate', text:'Where batters stand and where runs are scored. Shape helps umpires judge the strike zone.'},
-    first: {title:'First Base', text:'First base bag. Fielders often try to make plays here.'},
-    second: {title:'Second Base', text:'Second base; common pivot for double plays.'},
-    third: {title:'Third Base', text:'Third base; commonly called the hot corner.'},
-    mound: {title:"Pitcher's Plate", text:"Narrow white plate on the mound; shortened and visually thicker per request."},
-    shortstop: {title:"Shortstop", text:"Between second and third, slightly behind second; key infield defender."},
-    infield: {title:"Infield", text:"Dirt area connecting the bases."},
-    outfield: {title:"Outfield", text:"Grassy area beyond the baselines."}
+    home: {title:'Home Plate', text:'Where batters stand; runs are scored. Rotated for correct orientation.'},
+    first:{title:'First Base', text:'Bag at the first corner of the diamond.'},
+    second:{title:'Second Base', text:'Bag at the top corner of the diamond.'},
+    third:{title:'Third Base', text:'Bag at the third corner of the diamond.'},
+    mound:{title:"Pitcher's Plate", text:'Shorter, thicker white plate on the circular mound.'},
+    shortstop:{title:'Shortstop', text:'Between second and third, slightly behind the baseline.'}
   };
-
-  const primary = ['home','first','second','third','mound','shortstop','infield','outfield'];
-  const found = new Set();
-
-  // mapping selectors (IDs preserved)
   const mapping = {
-    home: ['#homePlate','button[data-area="home"]'],
-    first: ['#firstBase','button[data-area="first"]'],
-    second: ['#secondBase','button[data-area="second"]'],
-    third: ['#thirdBase','button[data-area="third"]'],
-    mound: ['#pitcherPlate','button[data-area="mound"]'],
-    shortstop: ['#shortstop','button[data-area="shortstop"]'],
-    infield: ['#infieldDirt','button[data-area="infield"]'],
-    outfield: ['#fieldSVG','button[data-area="outfield"]']
+    home:'#homePlate',
+    first:'#firstBase',
+    second:'#secondBase',
+    third:'#thirdBase',
+    mound:'#pitcherPlate',
+    shortstop:'#shortstop'
   };
+  const card = document.getElementById('card');
+  const t = document.getElementById('cardTitle');
+  const b = document.getElementById('cardBody');
+  const closeBtn = document.getElementById('cardClose');
 
-  const infoCard = document.getElementById('infoCard');
-  const infoTitle = document.getElementById('infoTitle');
-  const infoBody = document.getElementById('infoBody');
-  const cardClose = document.getElementById('cardClose');
-  const foundCount = document.getElementById('foundCount');
-  const totalCount = document.getElementById('totalCount');
-  totalCount.textContent = primary.length;
+  function show(area, ev){
+    const d = descriptions[area];
+    if(!d) return;
+    t.textContent = d.title; b.textContent = d.text;
+    card.style.display='block'; card.setAttribute('aria-hidden','false');
 
-  function showCard(area, ev){
-    const data = descriptions[area];
-    if(!data) return;
-    infoTitle.textContent = data.title;
-    infoBody.textContent = data.text;
-    infoCard.style.display = 'block';
-    infoCard.setAttribute('aria-hidden','false');
-
-    // discovery tracking
-    if(primary.includes(area) && !found.has(area)){
-      found.add(area);
-      foundCount.textContent = found.size;
-      if(found.size === primary.length){
-        document.getElementById('complete').style.display = 'block';
-      }
-    }
-
-    // position near event or element
-    let x=window.innerWidth/2, y=window.innerHeight/2;
-    if(ev && ev.clientX){
-      x = ev.clientX + 12;
-      y = ev.clientY + 6;
-    } else {
-      const svg = document.getElementById('fieldSVG');
-      const r = svg.getBoundingClientRect();
-      x = r.left + r.width*0.72;
-      y = r.top + r.height*0.36;
-    }
-    infoCard.style.left = Math.max(12, x) + 'px';
-    infoCard.style.top = Math.max(12, y) + 'px';
-
-    // clamp to viewport
-    requestAnimationFrame(()=>{
-      const rect = infoCard.getBoundingClientRect(), pad=12;
-      if(rect.right > window.innerWidth - pad) infoCard.style.left = (window.innerWidth - rect.width - pad) + 'px';
-      if(rect.bottom > window.innerHeight - pad) infoCard.style.top = (window.innerHeight - rect.height - pad) + 'px';
-    });
+    let x = ev?.clientX ?? window.innerWidth/2;
+    let y = ev?.clientY ?? window.innerHeight/3;
+    card.style.left = (x + 10) + 'px';
+    card.style.top  = (y + 10) + 'px';
   }
+  function hide(){ card.style.display='none'; card.setAttribute('aria-hidden','true'); }
 
-  function hideCard(){ infoCard.style.display='none'; infoCard.setAttribute('aria-hidden','true'); }
-
-  // wire interactions
-  Object.keys(mapping).forEach(area=>{
-    const [selSvg, selBtn] = mapping[area];
-    const svgEl = document.querySelector(selSvg);
-    const btnEl = document.querySelector(selBtn);
-    if(svgEl){
-      svgEl.addEventListener('click', (e)=>{ e.stopPropagation(); showCard(area,e); });
-      svgEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); showCard(area,e); }});
-    }
-    if(btnEl){
-      btnEl.addEventListener('click', (e)=>{ showCard(area,e); });
-      btnEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); showCard(area,e); }});
+  Object.entries(mapping).forEach(([area, sel])=>{
+    const el = document.querySelector(sel);
+    if(el){
+      el.addEventListener('click', e=>{ e.stopPropagation(); show(area,e); });
+      el.addEventListener('keydown', e=>{
+        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); show(area,e); }
+      });
     }
   });
-
-  // close handlers
-  cardClose.addEventListener('click', hideCard);
-  cardClose.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') hideCard(); });
-
-  document.addEventListener('click', (e)=>{
-    const isHot = e.target.closest('.hotspot') || e.target.closest('.panel') || e.target.closest('.info');
-    if(!isHot) hideCard();
+  closeBtn.addEventListener('click', hide);
+  closeBtn.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') hide(); });
+  document.addEventListener('click', e=>{
+    const inside = e.target.closest('.hotspot') || e.target.closest('.info') || e.target.closest('.panel');
+    if(!inside) hide();
   });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideCard(); });
-
-  // Ensure SVG elements with tabindex exist for keyboard focus
-  window.addEventListener('resize', ()=>{ if(infoCard.style.display==='block'){} });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') hide(); });
 </script>
 </body>
 </html>
