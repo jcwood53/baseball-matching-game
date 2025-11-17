@@ -1,5 +1,3 @@
-Field Explorer Code For GitHub.
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,6 +32,11 @@ Field Explorer Code For GitHub.
   .controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
   .btn{background:#0d3c55;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px;border:none;cursor:pointer}
   .btn.secondary{background:#e9f7ef;color:#0d3c55}
+  /* Small responsive tweak for checklist area */
+  @media (max-width:700px) {
+    #quizWrap{flex-direction:column}
+    #quizChecklist{width:100%;border-left:none;padding-left:0;margin-top:10px}
+  }
 </style>
 </head>
 <body>
@@ -64,21 +67,37 @@ Field Explorer Code For GitHub.
         <!-- Background -->
         <rect x="0" y="0" width="1800" height="2400" fill="url(#gGrass)"/>
 
-        <!-- Outfield / warning track -->
+        <!-- Outfield / warning track (slightly extended compared to original) -->
         <path id="warningTrack" d="M120 280 A1078 1078 0 0 1 1680 280 L1680 350 A1100 1100 0 0 0 120 350 Z"
               fill="#d9c0a0" opacity="0.55"/>
 
+        <!-- Extra grass/dirt texture (decorative) -->
+        <g id="grassDetails" opacity="0.95">
+          <ellipse cx="900" cy="420" rx="700" ry="240" fill="rgba(0,0,0,0.03)"/>
+          <ellipse cx="900" cy="520" rx="760" ry="260" fill="rgba(0,0,0,0.02)"/>
+          <ellipse cx="520" cy="520" rx="220" ry="140" fill="rgba(16,47,33,0.06)"/>
+          <ellipse cx="1100" cy="900" rx="120" ry="52" fill="#d7ad78" opacity="0.22"/>
+          <ellipse cx="700"  cy="960" rx="84"  ry="36" fill="#d7ad78" opacity="0.18"/>
+          <path d="M120 340 A980 980 0 0 1 1680 340 L1680 380 A1000 1000 0 0 0 120 380 Z" fill="rgba(0,0,0,0.03)"/>
+        </g>
+
         <!-- Diamond group centered -->
         <g id="diamondRoot" transform="translate(900,900)">
-          <!-- Infield dirt -->
+          <!-- Infield dirt (diamond corners at +/-720 units from center per your doc) -->
           <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+
           <!-- Baselines (infield chalk) -->
           <path id="baseline_home_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
           <path id="baseline_1_2"     d="M720 0 L0 720"  stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
           <path id="baseline_2_3"     d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
           <path id="baseline_3_home"  d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
 
-          <!-- Bases (bags) with labels -->
+          <!-- Foul lines (underlay) - local coords so they follow diamondRoot; 1.1× extension -->
+          <!-- local home point is (0,720) in this group -->
+          <line id="foulRight" x1="0" y1="720" x2="792"  y2="-792" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none" />
+          <line id="foulLeft"  x1="0" y1="720" x2="-792" y2="-792" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none" />
+
+          <!-- Bases (bags) with labels (drawn after foul lines so they sit on top) -->
           <g id="firstBaseGroup" transform="translate(720,0)">
             <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
                   fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
@@ -104,22 +123,15 @@ Field Explorer Code For GitHub.
                      tabindex="0" role="button" aria-label="Home plate"/>
           </g>
 
-          <!-- Mound group: moved to row 5 between D & E (translate y ~ +100 from diamond center) -->
+          <!-- Mound group: translated per your doc -->
           <g id="moundGroup" transform="translate(0,100)" aria-label="Pitcher's mound">
             <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
-            <!-- Pitcher's plate sized 1" x 1/2" ~ width=40 height=20 (units consistent with grid) -->
             <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
                   fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
           </g>
         </g>
 
-        <!-- Foul lines drawn as continuations of baselines from home center (900,1620) out into outfield -->
-        <!-- Right foul line (home -> 1B vector extended) -->
-        <line id="foulRight" x1="900" y1="1620" x2="1764" y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
-        <!-- Left foul line (home -> 3B vector extended) -->
-        <line id="foulLeft"  x1="900" y1="1620" x2="36"  y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
-
-        <!-- Coach boxes rotated 270 degrees and offset ~10 units into foul territory -->
+        <!-- Coach boxes (kept outside diamondRoot; coordinates are canvas-space) -->
         <g id="coachBoxes">
           <g id="coach1" transform="translate(1520,1050) rotate(315)">
             <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
@@ -139,18 +151,16 @@ Field Explorer Code For GitHub.
           <text   id="onDeckRightLabel" x="1520" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
         </g>
 
-        <!-- Outfield position labels -->
+        <!-- Outfield labels -->
         <g id="outfieldLabels" fill="#fff" font-weight="700" text-anchor="middle">
-          <text id="cfLabel" x="900"  y="50" font-size="26">Center Fielder</text>
-          <text id="lfLabel" x="280"  y="250" font-size="26">Left Fielder</text>
-          <text id="rfLabel" x="1520" y="250" font-size="26">Right Fielder</text>
+          <text id="cfLabel" x="900"  y="360" font-size="32">Center Fielder</text>
+          <text id="lfLabel" x="640"  y="560" font-size="26">Left Fielder</text>
+          <text id="rfLabel" x="1160" y="560" font-size="26">Right Fielder</text>
         </g>
 
-        <!-- DEV GRID OVERLAY: columns A-H x rows 1-8; spacing 200 units; includes half-step lines at 100 units -->
+        <!-- DEV GRID OVERLAY -->
         <g id="devGrid" stroke="#0d3c55" stroke-width="1" opacity="0.45" fill="#0d3c55" font-family="Arial,Helvetica,sans-serif">
-          <!-- Vertical major lines & labels -->
           <g id="gridColumns">
-            <!-- columns at x=200..1600 step 200 -->
             <line x1="200" x2="200" y1="0" y2="1700"/><text class="gridLabel" x="196" y="28">A</text>
             <line x1="400" x2="400" y1="0" y2="1700"/><text class="gridLabel" x="396" y="28">B</text>
             <line x1="600" x2="600" y1="0" y2="1700"/><text class="gridLabel" x="596" y="28">C</text>
@@ -159,7 +169,6 @@ Field Explorer Code For GitHub.
             <line x1="1200" x2="1200" y1="0" y2="1700"/><text class="gridLabel" x="1196" y="28">F</text>
             <line x1="1400" x2="1400" y1="0" y2="1700"/><text class="gridLabel" x="1396" y="28">G</text>
             <line x1="1600" x2="1600" y1="0" y2="1700"/><text class="gridLabel" x="1596" y="28">H</text>
-            <!-- half-step verticals at 100,300,... -->
             <line x1="100" x2="100" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
             <line x1="300" x2="300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
             <line x1="500" x2="500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
@@ -170,7 +179,6 @@ Field Explorer Code For GitHub.
             <line x1="1500" x2="1500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
           </g>
 
-          <!-- Horizontal major lines & labels -->
           <g id="gridRows">
             <line x1="0" x2="1800" y1="200" y2="200"/><text class="gridLabel" x="24" y="206">1</text>
             <line x1="0" x2="1800" y1="400" y2="400"/><text class="gridLabel" x="24" y="406">2</text>
@@ -180,7 +188,6 @@ Field Explorer Code For GitHub.
             <line x1="0" x2="1800" y1="1200" y2="1200"/><text class="gridLabel" x="24" y="1206">6</text>
             <line x1="0" x2="1800" y1="1400" y2="1400"/><text class="gridLabel" x="24" y="1406">7</text>
             <line x1="0" x2="1800" y1="1600" y2="1600"/><text class="gridLabel" x="24" y="1606">8</text>
-            <!-- half-step horizontals at 100,300,... -->
             <line x1="0" x2="1800" y1="100" y2="100" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
             <line x1="0" x2="1800" y1="300" y2="300" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
             <line x1="0" x2="1800" y1="500" y2="500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
@@ -191,10 +198,7 @@ Field Explorer Code For GitHub.
             <line x1="0" x2="1800" y1="1500" y2="1500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
           </g>
 
-          <!-- grid intersection dots (helpful visual anchors) -->
           <g id="gridDots" opacity="0.6" fill="#0d3c55">
-            <!-- major intersections (sample; you can reference any A1..H8) -->
-            <!-- We'll render a dot at each major intersection programmatically in JS if needed -->
             <circle cx="600" cy="1000" r="3"/><!-- C5 -->
             <circle cx="200" cy="1200" r="3"/><!-- A6 -->
             <circle cx="1400" cy="1200" r="3"/><!-- G6 -->
@@ -209,6 +213,24 @@ Field Explorer Code For GitHub.
         <button class="btn" id="removeGridBtn">Remove Grid</button>
         <button class="btn secondary" id="resetBtn">Reset View</button>
       </div>
+
+      <!-- Quiz checklist UI -->
+      <div id="quizWrap" style="margin-top:14px;display:flex;gap:12px;align-items:flex-start">
+        <div id="quizPrompt" style="flex:1">
+          <div style="font-weight:700;margin-bottom:6px">Spot the part</div>
+          <div id="quizInstruction" style="color:#61777b;font-size:13px">Click the named field part on the diagram. No grade — just check your knowledge.</div>
+          <div style="margin-top:10px">
+            <button id="quizStartBtn" class="btn secondary" style="padding:8px 10px">Start Quiz</button>
+            <button id="quizResetBtn" class="btn" style="margin-left:6px;display:none">Reset</button>
+          </div>
+        </div>
+
+        <div id="quizChecklist" style="width:280px;border-left:1px solid rgba(0,0,0,0.04);padding-left:12px">
+          <div style="font-weight:700;margin-bottom:8px">Checklist</div>
+          <ul id="quizList" style="list-style:none;padding:0;margin:0;color:#13353a"></ul>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -227,7 +249,6 @@ Field Explorer Code For GitHub.
   Object.keys(info).forEach(key=>{
     const el = document.getElementById(key);
     if(!el) return;
-    const panel = document.getElementById('panel');
     el.addEventListener('click', (ev)=>{
       showCard(info[key].title, info[key].text, ev.clientX, ev.clientY);
       ev.stopPropagation();
@@ -252,7 +273,7 @@ Field Explorer Code For GitHub.
     const left = Math.min(Math.max(16, x - panelRect.left + 8), panelRect.width - 280);
     const top  = Math.min(Math.max(16, y - panelRect.top + 8), panelRect.height - 120);
     card.style.left = left + 'px';
-    card.style.top  = top  + 'px';
+    card.style.top  = top + 'px';
   }
 
   function hideCard(){ card.style.display = 'none'; card.setAttribute('aria-hidden','true'); }
@@ -272,9 +293,7 @@ Field Explorer Code For GitHub.
   document.getElementById('removeGridBtn').addEventListener('click', ()=>{
     removeDevGrid();
   });
-
   document.getElementById('resetBtn').addEventListener('click', ()=>{
-    // simple reset by reloading the page
     location.reload();
   });
 
@@ -283,33 +302,184 @@ Field Explorer Code For GitHub.
     if(g) g.parentNode.removeChild(g);
   }
 
-  // If you want programmatic moves using grid refs, here's a helper:
-  // convertGridRef('C5') -> {x:600,y:1000}; handles half-steps like C5.5
+  // convertGridRef('C5') helper (keeps your earlier logic)
   function convertGridRef(ref){
-    // columns A..H map to x = 200 * (index + offset) where offset .5 -> +0.5
-    // rows 1..8 map to y = 200 * (row) where row number 1 => 200; so row N => N*200
-    // Note viewBox origin: top-left is (0,0)
     const match = String(ref).toUpperCase().match(/^([A-H])(\d(?:\.\d)?)$/);
     if(!match) return null;
     const col = match[1];
     const row = parseFloat(match[2]);
     const colIndex = col.charCodeAt(0) - 65; // A=0..H=7
-    const x = (colIndex * 200) + 200 * ((row%1>0)?0.5:0) + 0; // base + half-step if .5
-    // Better: compute based on exact decimal
-    const colOffset = colIndex * 200 + ( (row%1) ? 100 : 0 );
     const xFinal = 200 + colIndex*200 + ( (ref.includes('.5')) ? 100 : 0 );
     const yFinal = row * 200;
     return {x: xFinal, y: yFinal};
   }
 
-  // Example: move mound to C5 you can call via console:
-  // const p = convertGridRef('C5'); document.getElementById('moundGroup').setAttribute('transform','translate('+(p.x-900)+','+(p.y-900)+')');
+  // =======================
+  // Quiz module (non-graded)
+  // =======================
+  (function(){
+    const PARTS = [
+      {id:'homePlate', name:'Home Plate'},
+      {id:'firstBase', name:'First Base'},
+      {id:'secondBase', name:'Second Base'},
+      {id:'thirdBase', name:'Third Base'},
+      {id:'moundCircle', name:"Pitcher's Mound"},
+      {id:'onDeckLeft', name:'On-deck Left'},
+      {id:'onDeckRight', name:'On-deck Right'}
+    ];
 
-  // Accessibility note: ensure tabindex is present on interactive elements (we used class 'hotspot' and tabindex where needed)
+    const startBtn = document.getElementById('quizStartBtn');
+    const resetBtn = document.getElementById('quizResetBtn');
+    const quizList = document.getElementById('quizList');
+    const instruction = document.getElementById('quizInstruction');
+
+    let currentSequence = [];
+    let currentIndex = 0;
+    let foundSet = new Set();
+
+    function renderChecklist(){
+      quizList.innerHTML = '';
+      PARTS.forEach(part=>{
+        const li = document.createElement('li');
+        li.id = 'chk_'+part.id;
+        li.style.padding = '6px 0';
+        li.style.display = 'flex';
+        li.style.justifyContent = 'space-between';
+        li.style.alignItems = 'center';
+        li.innerHTML = `<span>${part.name}</span><span aria-hidden="true" style="width:22px;text-align:right;color:#8aa7a4">—</span>`;
+        quizList.appendChild(li);
+      });
+    }
+
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    function startQuiz(){
+      currentSequence = shuffle(PARTS.map(p=>p.id)).slice();
+      currentIndex = 0;
+      foundSet.clear();
+      renderChecklist();
+      highlightPrompt();
+      startBtn.style.display = 'none';
+      resetBtn.style.display = '';
+      instruction.textContent = 'Click the highlighted part on the field.';
+    }
+
+    function resetQuiz(){
+      currentSequence = [];
+      currentIndex = 0;
+      foundSet.clear();
+      renderChecklist();
+      clearPrompts();
+      startBtn.style.display='';
+      resetBtn.style.display='none';
+      instruction.textContent = 'Click Start Quiz to begin.';
+    }
+
+    function highlightPrompt(){
+      clearPrompts();
+      if(currentIndex >= currentSequence.length) {
+        instruction.textContent = 'Nice work — you found them all!';
+        return;
+      }
+      const id = currentSequence[currentIndex];
+      const part = PARTS.find(p=>p.id===id);
+      if(!part) return;
+      instruction.textContent = `Find: ${part.name}`;
+      const el = document.getElementById(id);
+      if(el){
+        el.dataset.quizHighlight = '1';
+        el.style.transition = 'filter 200ms, opacity 200ms';
+        el.style.filter = 'drop-shadow(0 8px 10px rgba(13,60,85,0.18))';
+        if(el.tagName==='rect' || el.tagName==='polygon' || el.tagName==='circle'){
+          el.style.opacity = 0.95;
+        }
+        el.setAttribute('aria-describedby','quizHint');
+      }
+    }
+
+    function clearPrompts(){
+      PARTS.forEach(p=>{
+        const el = document.getElementById(p.id);
+        if(!el) return;
+        delete el.dataset.quizHighlight;
+        el.style.filter = '';
+        el.style.opacity = '';
+        el.removeAttribute('aria-describedby');
+      });
+    }
+
+    function markFound(id){
+      const li = document.getElementById('chk_'+id);
+      if(!li) return;
+      const mark = li.querySelector('span:last-child');
+      if(mark) mark.textContent = '✓';
+      li.style.color = '#0d3c55';
+    }
+
+    function partClicked(ev){
+      const id = ev.currentTarget.id;
+      if(!currentSequence || currentSequence.length===0){
+        return;
+      }
+      if(foundSet.has(id)) return;
+      const expected = currentSequence[currentIndex];
+      if(id === expected){
+        foundSet.add(id);
+        markFound(id);
+        currentIndex++;
+        const el = ev.currentTarget;
+        if(el.animate) el.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:220});
+        if(currentIndex < currentSequence.length){
+          highlightPrompt();
+        } else {
+          clearPrompts();
+          instruction.textContent = 'All done — nice work!';
+        }
+      } else {
+        if(ev.currentTarget.animate) {
+          ev.currentTarget.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:240});
+        }
+      }
+    }
+
+    function attachPartHandlers(){
+      PARTS.forEach(p=>{
+        const el = document.getElementById(p.id);
+        if(!el) return;
+        if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0');
+        el.addEventListener('click', partClicked);
+        el.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); partClicked({currentTarget:ev.currentTarget}); }});
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      renderChecklist();
+      attachPartHandlers();
+      instruction.textContent = 'Click Start Quiz to begin.';
+      startBtn.addEventListener('click', startQuiz);
+      resetBtn.addEventListener('click', resetQuiz);
+    });
+
+    window._fieldExplorer = window._fieldExplorer || {};
+    window._fieldExplorer.resetQuiz = resetQuiz;
+  })();
+
+  // Accessibility: allow remove grid via keyboard (focus on button)
+  document.addEventListener('keydown', (ev)=>{
+    if(ev.key==='g' && ev.ctrlKey){
+      const g = document.getElementById('devGrid');
+      if(g) g.remove();
+    }
+  });
 </script>
 </body>
 </html>
-
 
 
 
