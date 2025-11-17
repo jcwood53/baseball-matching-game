@@ -10,38 +10,43 @@
     --grass-light:#2f8c57;
     --dirt-1:#d6a770;
     --dirt-2:#c28f4f;
-    --chalk:#fff;
+    --chalk:#ffffff;
     --chalk-soft:#f7ead7;
     --stroke:#0b3940;
+    --grid-color:#0d3c55;
   }
   html,body{height:100%;margin:0}
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f4fbf7;color:#13353a;display:flex;justify-content:center;padding:16px}
   .wrap{width:100%;max-width:1200px;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(10,25,30,0.12);padding:14px}
   h1{margin:0 0 6px 0;font-size:20px}
   .subtitle{color:#61777b;font-size:13px;margin-bottom:10px}
-  .panel{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px}
+  .panel{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px;position:relative}
   svg{width:100%;height:auto;display:block}
-  .info{position:absolute;background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 12px 30px rgba(10,25,30,0.12);border-radius:10px;padding:10px;min-width:240px;display:none;z-index:10}
-  .info h3{margin:0 0 6px 0;font-size:15px}
-  .info p{margin:0;font-size:13px;color:#61777b}
-  .close{position:absolute;right:8px;top:8px;cursor:pointer;color:#61777b}
-  .legend{font-size:13px;color:#61777b;margin-top:8px}
   .hotspot:focus{outline:3px solid rgba(47,140,87,0.25)}
+  text.gridLabel{fill:var(--grid-color);font-weight:700;font-size:18px}
+  .infoCard{position:absolute;display:none;min-width:260px;background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 12px 30px rgba(10,25,30,0.12);padding:12px;border-radius:8px;z-index:20}
+  .infoCard h3{margin:0 0 6px 0;font-size:15px}
+  .infoCard p{margin:0;color:#566b6d;font-size:13px}
+  .closeBtn{position:absolute;right:8px;top:6px;cursor:pointer;color:#61777b;font-weight:700}
+  .legend{font-size:13px;color:#61777b;margin-top:8px}
+  .controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  .btn{background:#0d3c55;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px;border:none;cursor:pointer}
+  .btn.secondary{background:#e9f7ef;color:#0d3c55}
 </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Baseball Field Explorer — Dev Grid</h1>
-    <div class="subtitle">Use grid references (e.g., C5, A6, G6) to direct precise placement. We’ll remove the grid after layout is locked.</div>
+    <div class="subtitle">Use grid references (e.g., C5, A6, G6, C5.5) to direct placement. Remove the grid when layout is locked.</div>
 
-    <div class="panel" style="position:relative">
-      <div id="card" class="info" role="dialog" aria-hidden="true">
-        <div id="cardClose" class="close" tabindex="0" aria-label="Close">✕</div>
+    <div class="panel" id="panel">
+      <!-- Info card -->
+      <div id="infoCard" class="infoCard" role="dialog" aria-hidden="true">
+        <div class="closeBtn" id="cardClose" tabindex="0" aria-label="Close info">✕</div>
         <h3 id="cardTitle">Title</h3>
         <p id="cardBody">Description</p>
       </div>
 
-      <!-- SVG: viewBox units chosen so grid spacing feels intuitive -->
       <svg id="fieldSVG" viewBox="0 0 1800 1700" role="img" aria-label="Baseball field diagram with development grid">
         <defs>
           <linearGradient id="gGrass" x1="0" x2="1">
@@ -54,192 +59,251 @@
           </radialGradient>
         </defs>
 
-        <!-- Background grass -->
+        <!-- Background -->
         <rect x="0" y="0" width="1800" height="1700" fill="url(#gGrass)"/>
 
-        <!-- Deeper outfield arc / warning track (edit R/depth by adjusting A values) -->
+        <!-- Outfield / warning track -->
         <path id="warningTrack" d="M120 280 A980 980 0 0 1 1680 280 L1680 350 A1000 1000 0 0 0 120 350 Z"
               fill="#d9c0a0" opacity="0.55"/>
 
-        <!-- Diamond root: center at (900,900); rotated square as perfect diamond -->
+        <!-- Diamond group centered -->
         <g id="diamondRoot" transform="translate(900,900)">
-          <!-- Infield dirt as rotated square (corner radius ~720) -->
-          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z"
-                fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+          <!-- Infield dirt -->
+          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+          <!-- Baselines (infield chalk) -->
+          <path id="baseline_home_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_1_2"     d="M720 0 L0 720"  stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_2_3"     d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_3_home"  d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
 
-          <!-- Baselines (painted chalk) -->
-          <path id="baseline_H_to_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_1_to_2" d="M720 0 L0 720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_2_to_3" d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_3_to_H" d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-
-          <!-- Bases with labels ON bags (black) -->
+          <!-- Bases (bags) with labels -->
           <g id="firstBaseGroup" transform="translate(720,0)">
             <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
                   fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
             <text id="label1B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
           </g>
+
           <g id="secondBaseGroup" transform="translate(0,-720)">
             <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
                   fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"/>
             <text id="label2B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
           </g>
+
           <g id="thirdBaseGroup" transform="translate(-720,0)">
             <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
                   fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"/>
             <text id="label3B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
           </g>
 
-          <!-- Home plate rotated 180° -->
+          <!-- Home plate rotated -->
           <g id="homeGroup" transform="translate(0,720) rotate(180)">
             <polygon id="homePlate" class="hotspot"
                      points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4"
                      tabindex="0" role="button" aria-label="Home plate"/>
           </g>
 
-          <!-- Mound: circular; pitcher’s plate shorter and thicker -->
-          <g id="moundGroup" transform="translate(0,-110)">
-            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"></circle>
-            <!-- width 120 (base width), height shorter; stroke thickened -->
-            <rect id="pitcherPlate" class="hotspot" x="-60" y="-5" width="120" height="10" rx="3"
+          <!-- Mound group: moved to row 5 between D & E (translate y ~ +100 from diamond center) -->
+          <g id="moundGroup" transform="translate(0,100)" aria-label="Pitcher's mound">
+            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
+            <!-- Pitcher's plate sized 1" x 1/2" ~ width=40 height=20 (units consistent with grid) -->
+            <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
                   fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
-          </g>
-
-          <!-- Shortstop example hotspot -->
-          <g id="shortstopGroup" transform="translate(-210,-420)">
-            <circle id="shortstop" class="hotspot" r="30" fill="#fff" stroke="#c6c6c6" stroke-width="4"
-                    tabindex="0" role="button" aria-label="Shortstop"/>
-            <text x="0" y="84" font-size="20" text-anchor="middle" fill="#fff" font-weight="700">SS</text>
           </g>
         </g>
 
-        <!-- Foul lines: exact continuation of baseline vectors from home center -->
-        <!-- Home center = diamond center (900,900) + Y offset 720 => (900,1620) -->
-        <line id="foulRight" x1="900" y1="1620" x2="1700" y2="240" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
-        <line id="foulLeft"  x1="900" y1="1620" x2="100"  y2="240" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
-        <line x1="900" y1="1620" x2="1700" y2="240" stroke="var(--chalk-soft)" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
-        <line x1="900" y1="1620" x2="100"  y2="240" stroke="var(--chalk-soft)" stroke-width="2" stroke-dasharray="10 6" opacity="0.6"/>
+        <!-- Foul lines drawn as continuations of baselines from home center (900,1620) out into outfield -->
+        <!-- Right foul line (home -> 1B vector extended) -->
+        <line id="foulRight" x1="900" y1="1620" x2="1620" y2="900" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Left foul line (home -> 3B vector extended) -->
+        <line id="foulLeft"  x1="900" y1="1620" x2="180"  y2="900" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
 
-        <!-- Coach boxes: place/rotate by grid references later -->
+        <!-- Coach boxes rotated 270 degrees and offset ~10 units into foul territory -->
         <g id="coachBoxes">
-          <!-- First base coach box (initial placement near first baseline) -->
-          <g id="coach1" transform="translate(1420,1010) rotate(90)">
+          <g id="coach1" transform="translate(1430,910) rotate(270)">
             <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
             <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (1B)</text>
           </g>
-          <!-- Third base coach box -->
-          <g id="coach3" transform="translate(380,1010) rotate(-90)">
+          <g id="coach3" transform="translate(370,910) rotate(270)">
             <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
             <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (3B)</text>
           </g>
         </g>
 
-        <!-- On-deck circles: aligned laterally; easy to nudge -->
+        <!-- On-deck circles with black centered labels -->
         <g id="onDecks">
           <circle id="onDeckLeft"  cx="280"  cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text   x="280"  y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
+          <text   id="onDeckLeftLabel" x="280" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
           <circle id="onDeckRight" cx="1520" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text   x="1520" y="1548" font-size="14" text-anchor="middle" fill="#596a6e">On-deck</text>
+          <text   id="onDeckRightLabel" x="1520" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
         </g>
 
-        <!-- Outfield position labels (mid/deep outfield) -->
+        <!-- Outfield position labels -->
         <g id="outfieldLabels" fill="#fff" font-weight="700" text-anchor="middle">
           <text id="cfLabel" x="900"  y="360" font-size="32">Center Fielder</text>
           <text id="lfLabel" x="640"  y="560" font-size="26">Left Fielder</text>
           <text id="rfLabel" x="1160" y="560" font-size="26">Right Fielder</text>
         </g>
 
-        <!-- DEV GRID OVERLAY (temporary). Remove by deleting this <g id="devGrid"> block when done. -->
-        <g id="devGrid" stroke="#666" stroke-width="1" opacity="0.35" fill="#333" font-size="18">
-          <!-- Grid spacing: 200 units. Columns A–H at x=200..1600 -->
-          <!-- Vertical lines + column labels -->
-          <g id="gridCols">
-            <line x1="200" y1="0" x2="200" y2="1700"/><text x="196" y="28">A</text>
-            <line x1="400" y1="0" x2="400" y2="1700"/><text x="396" y="28">B</text>
-            <line x1="600" y1="0" x2="600" y2="1700"/><text x="596" y="28">C</text>
-            <line x1="800" y1="0" x2="800" y2="1700"/><text x="796" y="28">D</text>
-            <line x1="1000" y1="0" x2="1000" y2="1700"/><text x="996" y="28">E</text>
-            <line x1="1200" y1="0" x2="1200" y2="1700"/><text x="1196" y="28">F</text>
-            <line x1="1400" y1="0" x2="1400" y2="1700"/><text x="1396" y="28">G</text>
-            <line x1="1600" y1="0" x2="1600" y2="1700"/><text x="1596" y="28">H</text>
+        <!-- DEV GRID OVERLAY: columns A-H x rows 1-8; spacing 200 units; includes half-step lines at 100 units -->
+        <g id="devGrid" stroke="#0d3c55" stroke-width="1" opacity="0.45" fill="#0d3c55" font-family="Arial,Helvetica,sans-serif">
+          <!-- Vertical major lines & labels -->
+          <g id="gridColumns">
+            <!-- columns at x=200..1600 step 200 -->
+            <line x1="200" x2="200" y1="0" y2="1700"/><text class="gridLabel" x="196" y="28">A</text>
+            <line x1="400" x2="400" y1="0" y2="1700"/><text class="gridLabel" x="396" y="28">B</text>
+            <line x1="600" x2="600" y1="0" y2="1700"/><text class="gridLabel" x="596" y="28">C</text>
+            <line x1="800" x2="800" y1="0" y2="1700"/><text class="gridLabel" x="796" y="28">D</text>
+            <line x1="1000" x2="1000" y1="0" y2="1700"/><text class="gridLabel" x="996" y="28">E</text>
+            <line x1="1200" x2="1200" y1="0" y2="1700"/><text class="gridLabel" x="1196" y="28">F</text>
+            <line x1="1400" x2="1400" y1="0" y2="1700"/><text class="gridLabel" x="1396" y="28">G</text>
+            <line x1="1600" x2="1600" y1="0" y2="1700"/><text class="gridLabel" x="1596" y="28">H</text>
+            <!-- half-step verticals at 100,300,... -->
+            <line x1="100" x2="100" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="300" x2="300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="500" x2="500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="700" x2="700" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="900" x2="900" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="1100" x2="1100" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="1300" x2="1300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="1500" x2="1500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
           </g>
-          <!-- Horizontal lines + row labels (rows 1–8 at y=200..1600) -->
+
+          <!-- Horizontal major lines & labels -->
           <g id="gridRows">
-            <line x1="0" y1="200" x2="1800" y2="200"/><text x="24" y="206">1</text>
-            <line x1="0" y1="400" x2="1800" y2="400"/><text x="24" y="406">2</text>
-            <line x1="0" y1="600" x2="1800" y2="600"/><text x="24" y="606">3</text>
-            <line x1="0" y1="800" x2="1800" y2="800"/><text x="24" y="806">4</text>
-            <line x1="0" y1="1000" x2="1800" y2="1000"/><text x="24" y="1006">5</text>
-            <line x1="0" y1="1200" x2="1800" y2="1200"/><text x="24" y="1206">6</text>
-            <line x1="0" y1="1400" x2="1800" y2="1400"/><text x="24" y="1406">7</text>
-            <line x1="0" y1="1600" x2="1800" y2="1600"/><text x="24" y="1606">8</text>
+            <line x1="0" x2="1800" y1="200" y2="200"/><text class="gridLabel" x="24" y="206">1</text>
+            <line x1="0" x2="1800" y1="400" y2="400"/><text class="gridLabel" x="24" y="406">2</text>
+            <line x1="0" x2="1800" y1="600" y2="600"/><text class="gridLabel" x="24" y="606">3</text>
+            <line x1="0" x2="1800" y1="800" y2="800"/><text class="gridLabel" x="24" y="806">4</text>
+            <line x1="0" x2="1800" y1="1000" y2="1000"/><text class="gridLabel" x="24" y="1006">5</text>
+            <line x1="0" x2="1800" y1="1200" y2="1200"/><text class="gridLabel" x="24" y="1206">6</text>
+            <line x1="0" x2="1800" y1="1400" y2="1400"/><text class="gridLabel" x="24" y="1406">7</text>
+            <line x1="0" x2="1800" y1="1600" y2="1600"/><text class="gridLabel" x="24" y="1606">8</text>
+            <!-- half-step horizontals at 100,300,... -->
+            <line x1="0" x2="1800" y1="100" y2="100" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="300" y2="300" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="500" y2="500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="700" y2="700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="900" y2="900" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="1100" y2="1100" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="1300" y2="1300" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
+            <line x1="0" x2="1800" y1="1500" y2="1500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
           </g>
-          <!-- Optional subtle dots at intersections for easier visual targeting -->
-          <g id="gridDots" opacity="0.35">
-            <!-- Generate a few sample dots; we can add more if useful -->
+
+          <!-- grid intersection dots (helpful visual anchors) -->
+          <g id="gridDots" opacity="0.6" fill="#0d3c55">
+            <!-- major intersections (sample; you can reference any A1..H8) -->
+            <!-- We'll render a dot at each major intersection programmatically in JS if needed -->
             <circle cx="600" cy="1000" r="3"/><!-- C5 -->
             <circle cx="200" cy="1200" r="3"/><!-- A6 -->
             <circle cx="1400" cy="1200" r="3"/><!-- G6 -->
           </g>
         </g>
+
       </svg>
 
-      <div class="legend">Legend: Use grid references (e.g., C5) when requesting placement and rotation adjustments. We’ll remove the grid after final review.</div>
+      <div class="legend">Legend: Use grid references like <strong>C5</strong> (column C, row 5) or half‑steps like <strong>C5.5</strong>. When layout is final, click <em>Remove Grid</em>.</div>
+
+      <div class="controls" style="margin-top:12px;">
+        <button class="btn" id="removeGridBtn">Remove Grid</button>
+        <button class="btn secondary" id="resetBtn">Reset View</button>
+      </div>
     </div>
   </div>
 
 <script>
-  // Info content and mapping
-  const descriptions = {
-    home: {title:'Home Plate', text:'Where batters stand; runs are scored. Rotated for correct orientation.'},
-    first:{title:'First Base', text:'Bag at the first corner of the diamond.'},
-    second:{title:'Second Base', text:'Bag at the top corner of the diamond.'},
-    third:{title:'Third Base', text:'Bag at the third corner of the diamond.'},
-    mound:{title:"Pitcher's Plate", text:'Shorter, thicker white plate on the circular mound.'},
-    shortstop:{title:'Shortstop', text:'Between second and third, slightly behind the baseline.'}
+  // Basic mapping for hotspots and their info text
+  const info = {
+    'firstBase': {title:'First Base', text:'The first base bag. Click to read more.'},
+    'secondBase': {title:'Second Base', text:'Second base is at the top of the diamond.'},
+    'thirdBase': {title:'Third Base', text:'Third base is the third corner of the diamond.'},
+    'homePlate': {title:'Home Plate', text:'Home plate is where batters stand and runs are scored.'},
+    'pitcherPlate': {title:"Pitcher's Plate", text:'The white rectangle on the mound where the pitcher throws from.'},
+    'moundCircle': {title:"Pitcher’s Mound", text:'The circular raised mound near the center of the infield.'}
   };
-  const mapping = {
-    home:'#homePlate',
-    first:'#firstBase',
-    second:'#secondBase',
-    third:'#thirdBase',
-    mound:'#pitcherPlate',
-    shortstop:'#shortstop'
-  };
-  const card = document.getElementById('card');
-  const t = document.getElementById('cardTitle');
-  const b = document.getElementById('cardBody');
-  const closeBtn = document.getElementById('cardClose');
 
-  function show(area, ev){
-    const d = descriptions[area];
-    if(!d) return;
-    t.textContent = d.title; b.textContent = d.text;
-    card.style.display='block'; card.setAttribute('aria-hidden','false');
+  // Attach click/keyboard handlers for elements with IDs matching the info keys
+  Object.keys(info).forEach(key=>{
+    const el = document.getElementById(key);
+    if(!el) return;
+    const panel = document.getElementById('panel');
+    el.addEventListener('click', (ev)=>{
+      showCard(info[key].title, info[key].text, ev.clientX, ev.clientY);
+      ev.stopPropagation();
+    });
+    el.addEventListener('keydown', (ev)=>{
+      if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); showCard(info[key].title, info[key].text, ev.clientX, ev.clientY); }
+    });
+  });
 
-    let x = ev?.clientX ?? window.innerWidth/2;
-    let y = ev?.clientY ?? window.innerHeight/3;
-    card.style.left = (x + 10) + 'px';
-    card.style.top  = (y + 10) + 'px';
+  const card = document.getElementById('infoCard');
+  const cardTitle = document.getElementById('cardTitle');
+  const cardBody = document.getElementById('cardBody');
+  const cardClose = document.getElementById('cardClose');
+
+  function showCard(title, body, x, y){
+    cardTitle.textContent = title;
+    cardBody.textContent = body;
+    card.style.display = 'block';
+    card.setAttribute('aria-hidden','false');
+    // position within panel bounds
+    const panelRect = document.getElementById('panel').getBoundingClientRect();
+    const left = Math.min(Math.max(16, x - panelRect.left + 8), panelRect.width - 280);
+    const top  = Math.min(Math.max(16, y - panelRect.top + 8), panelRect.height - 120);
+    card.style.left = left + 'px';
+    card.style.top  = top  + 'px';
   }
-  function hide(){ card.style.display='none'; card.setAttribute('aria-hidden','true'); }
 
-  Object.entries(mapping).forEach(([area, sel])=>{
-    const el = document.querySelector(sel);
-    if(el){
-      el.addEventListener('click', e=>{ e.stopPropagation(); show(area,e); });
-      el.addEventListener('keydown', e=>{
-        if(e.key==='Enter' || e.key===' '){ e.preventDefault(); show(area,e); }
-      });
-    }
+  function hideCard(){ card.style.display = 'none'; card.setAttribute('aria-hidden','true'); }
+
+  cardClose.addEventListener('click', hideCard);
+  cardClose.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' ') hideCard(); });
+
+  // Hide card when clicking outside
+  document.addEventListener('click', (ev)=>{
+    const inside = ev.target.closest('.infoCard') || ev.target.closest('.hotspot') || ev.target.closest('.panel');
+    if(!inside) hideCard();
   });
-  closeBtn.addEventListener('click', hide);
-  closeBtn.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') hide(); });
-  document.addEventListener('click', e=>{
-    const inside = e.target.closest('.hotspot') || e.target.closest('.info') || e.target.closest('.panel');
-    if(!inside) hide();
+
+  document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') hideCard(); });
+
+  // Remove grid button
+  document.getElementById('removeGridBtn').addEventListener('click', ()=>{
+    removeDevGrid();
   });
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') hide(); });
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    // simple reset by reloading the page
+    location.reload();
+  });
+
+  function removeDevGrid(){
+    const g = document.getElementById('devGrid');
+    if(g) g.parentNode.removeChild(g);
+  }
+
+  // If you want programmatic moves using grid refs, here's a helper:
+  // convertGridRef('C5') -> {x:600,y:1000}; handles half-steps like C5.5
+  function convertGridRef(ref){
+    // columns A..H map to x = 200 * (index + offset) where offset .5 -> +0.5
+    // rows 1..8 map to y = 200 * (row) where row number 1 => 200; so row N => N*200
+    // Note viewBox origin: top-left is (0,0)
+    const match = String(ref).toUpperCase().match(/^([A-H])(\d(?:\.\d)?)$/);
+    if(!match) return null;
+    const col = match[1];
+    const row = parseFloat(match[2]);
+    const colIndex = col.charCodeAt(0) - 65; // A=0..H=7
+    const x = (colIndex * 200) + 200 * ((row%1>0)?0.5:0) + 0; // base + half-step if .5
+    // Better: compute based on exact decimal
+    const colOffset = colIndex * 200 + ( (row%1) ? 100 : 0 );
+    const xFinal = 200 + colIndex*200 + ( (ref.includes('.5')) ? 100 : 0 );
+    const yFinal = row * 200;
+    return {x: xFinal, y: yFinal};
+  }
+
+  // Example: move mound to C5 you can call via console:
+  // const p = convertGridRef('C5'); document.getElementById('moundGroup').setAttribute('transform','translate('+(p.x-900)+','+(p.y-900)+')');
+
+  // Accessibility note: ensure tabindex is present on interactive elements (we used class 'hotspot' and tabindex where needed)
 </script>
 </body>
 </html>
