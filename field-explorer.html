@@ -63,7 +63,7 @@
         <rect x="0" y="0" width="1800" height="1700" fill="url(#gGrass)"/>
 
         <!-- Outfield / warning track -->
-        <path id="warningTrack" d="M120 280 A980 980 0 0 1 1680 280 L1680 350 A1000 1000 0 0 0 120 350 Z"
+        <path id="warningTrack" d="M120 280 A1200 1200 0 0 1 1680 280 L2000 350 A1000 1000 0 0 0 120 350 Z"
               fill="#d9c0a0" opacity="0.55"/>
 
         <!-- Diamond group centered -->
@@ -113,9 +113,9 @@
 
         <!-- Foul lines drawn as continuations of baselines from home center (900,1620) out into outfield -->
         <!-- Right foul line (home -> 1B vector extended) -->
-        <line id="foulRight" x1="720" y1="1620" x2="1620" y2="720" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <line id="foulRight" x1="" y1="1620" x2="1620" y2="900" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
         <!-- Left foul line (home -> 3B vector extended) -->
-        <line id="foulLeft"  x1="-720" y1="1620" x2="180"  y2="-720" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <line id="foulLeft"  x1="900" y1="1620" x2="180"  y2="900" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
 
         <!-- Coach boxes rotated 270 degrees and offset ~10 units into foul territory -->
         <g id="coachBoxes">
@@ -307,3 +307,5 @@
 </script>
 </body>
 </html>
+Notes and next steps:
+
