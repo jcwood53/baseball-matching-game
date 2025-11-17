@@ -1,3 +1,5 @@
+Field Explorer Code For GitHub.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,62 +68,56 @@
         <path id="warningTrack" d="M120 280 A1078 1078 0 0 1 1680 280 L1680 350 A1100 1100 0 0 0 120 350 Z"
               fill="#d9c0a0" opacity="0.55"/>
 
-       <!-- Diamond group centered -->
-<g id="diamondRoot" transform="translate(900,900)">
-  <!-- Infield dirt (diamond corners at +/- 792 units from center) -->
-  <path id="infieldDirt" d="M0 -792 L792 0 L0 792 L-792 0 Z"
-        fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+        <!-- Diamond group centered -->
+        <g id="diamondRoot" transform="translate(900,900)">
+          <!-- Infield dirt -->
+          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+          <!-- Baselines (infield chalk) -->
+          <path id="baseline_home_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_1_2"     d="M720 0 L0 720"  stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_2_3"     d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <path id="baseline_3_home"  d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
 
-  <!-- Baselines (infield chalk) -->
-  <path id="baseline_home_1" d="M0 -792 L792 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-  <path id="baseline_1_2"     d="M792 0 L0 792"  stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-  <path id="baseline_2_3"     d="M0 792 L-792 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-  <path id="baseline_3_home"  d="M-792 0 L0 -792" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+          <!-- Bases (bags) with labels -->
+          <g id="firstBaseGroup" transform="translate(720,0)">
+            <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
+            <text id="label1B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
+          </g>
 
-  <!-- Foul lines (underlay) - local coords inside diamondRoot so they follow the same origin -->
-  <!-- start at home local (0,792), extend along home->1B and home->3B directions -->
-  <line id="foulRight" x1="0" y1="792" x2="792*1.1" y2="-792*1.1"
-        stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
-  <line id="foulLeft"  x1="0" y1="792" x2="-792*1.1" y2="-792*1.1"
-        stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
+          <g id="secondBaseGroup" transform="translate(0,-720)">
+            <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"/>
+            <text id="label2B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
+          </g>
 
-  <!-- If your SVG parser won't accept the math expressions above, use these explicit values (1.1× extension): -->
-  <!-- <line id="foulRight" x1="0" y1="792" x2="871.2" y2="-871.2" ... /> -->
-  <!-- <line id="foulLeft"  x1="0" y1="792" x2="-871.2" y2="-871.2" ... /> -->
+          <g id="thirdBaseGroup" transform="translate(-720,0)">
+            <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
+                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"/>
+            <text id="label3B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
+          </g>
 
-  <!-- Bases (drawn after foul lines so bases sit on top) -->
-  <g id="firstBaseGroup" transform="translate(792,0)">
-    <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-          fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
-    <text id="label1B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
-  </g>
+          <!-- Home plate rotated -->
+          <g id="homeGroup" transform="translate(0,720) rotate(180)">
+            <polygon id="homePlate" class="hotspot"
+                     points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4"
+                     tabindex="0" role="button" aria-label="Home plate"/>
+          </g>
 
-  <g id="secondBaseGroup" transform="translate(0,-792)">
-    <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-          fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"/>
-    <text id="label2B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
-  </g>
+          <!-- Mound group: moved to row 5 between D & E (translate y ~ +100 from diamond center) -->
+          <g id="moundGroup" transform="translate(0,100)" aria-label="Pitcher's mound">
+            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
+            <!-- Pitcher's plate sized 1" x 1/2" ~ width=40 height=20 (units consistent with grid) -->
+            <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
+                  fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
+          </g>
+        </g>
 
-  <g id="thirdBaseGroup" transform="translate(-792,0)">
-    <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-          fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"/>
-    <text id="label3B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
-  </g>
-
-  <!-- Home plate rotated -->
-  <g id="homeGroup" transform="translate(0,792) rotate(180)">
-    <polygon id="homePlate" class="hotspot"
-             points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4"
-             tabindex="0" role="button" aria-label="Home plate"/>
-  </g>
-
-  <!-- Mound -->
-  <g id="moundGroup" transform="translate(0,110)" aria-label="Pitcher's mound">
-    <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
-    <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
-          fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
-  </g>
-</g>
+        <!-- Foul lines drawn as continuations of baselines from home center (900,1620) out into outfield -->
+        <!-- Right foul line (home -> 1B vector extended) -->
+        <line id="foulRight" x1="900" y1="1620" x2="1764" y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Left foul line (home -> 3B vector extended) -->
+        <line id="foulLeft"  x1="900" y1="1620" x2="36"  y2="756" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round"/>
 
         <!-- Coach boxes rotated 270 degrees and offset ~10 units into foul territory -->
         <g id="coachBoxes">
@@ -313,6 +309,7 @@
 </script>
 </body>
 </html>
+
 
 
 
