@@ -3,478 +3,87 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Baseball Field Explorer — Dev Grid (updated)</title>
+<title>Baseball Field Explorer</title>
 <style>
-  :root{
-    --grass-dark:#214f31; --grass-light:#2f8c57; --dirt-1:#d6a770; --dirt-2:#c28f4f;
-    --chalk:#ffffff; --chalk-soft:#f7ead7; --stroke:#0b3940; --grid-color:#0d3c55;
-  }
-  html,body{height:100%;margin:0}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#f4fbf7;color:#13353a;display:flex;justify-content:center;padding:16px}
-  .wrap{width:100%;max-width:1200px;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(10,25,30,0.12);padding:14px}
-  h1{margin:0 0 6px 0;font-size:20px}
-  .subtitle{color:#61777b;font-size:13px;margin-bottom:10px}
-  .panel{background:#fff;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:10px;position:relative}
-  svg{width:100%;height:auto;display:block}
-  .hotspot:focus{outline:3px solid rgba(47,140,87,0.25)}
-  text.gridLabel{fill:var(--grid-color);font-weight:700;font-size:18px}
-  .infoCard{position:absolute;display:none;min-width:260px;background:#fff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 12px 30px rgba(10,25,30,0.12);padding:12px;border-radius:8px;z-index:20}
-  .infoCard h3{margin:0 0 6px 0;font-size:15px}
-  .infoCard p{margin:0;color:#566b6d;font-size:13px}
-  .closeBtn{position:absolute;right:8px;top:6px;cursor:pointer;color:#61777b;font-weight:700}
-  .legend{font-size:13px;color:#61777b;margin-top:8px}
-  .controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
-  .btn{background:#0d3c55;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-size:13px;border:none;cursor:pointer}
-  .btn.secondary{background:#e9f7ef;color:#0d3c55}
-  @media (max-width:700px) {
-    #quizWrap{flex-direction:column}
-    #quizChecklist{width:100%;border-left:none;padding-left:0;margin-top:10px}
-  }
+  body {font-family:Georgia,serif;background:#f4fbf7;color:#13353a;display:flex;justify-content:center;padding:16px;margin:0;}
+  .wrap {width:100%;max-width:1200px;background:#fff;border-radius:12px;box-shadow:0 12px 32px rgba(10,25,30,0.12);padding:14px;}
+  h1 {margin:0 0 6px 0;font-size:22px;color:#0d3c55;}
+  svg {width:100%;height:auto;display:block;}
+  a.hotspot:focus {outline:3px solid rgba(47,140,87,0.25);}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Baseball Field Explorer — Dev Grid (updated)</h1>
-    <div class="subtitle">Clickable outfield boxes added for the quiz; foul lines aligned to baselines.</div>
+<div class="wrap">
+  <h1>Baseball Field Explorer</h1>
+  <p>Click any position on the field to learn more. Use the text list below if hotspots are difficult to tap.</p>
 
-    <div class="panel" id="panel">
-      <div id="infoCard" class="infoCard" role="dialog" aria-hidden="true">
-        <div class="closeBtn" id="cardClose" tabindex="0" aria-label="Close info">✕</div>
-        <h3 id="cardTitle">Title</h3>
-        <p id="cardBody">Description</p>
-      </div>
+  <svg viewBox="0 0 1800 1700" role="img" aria-label="Baseball field diagram with hotspots">
+    <!-- Background -->
+    <rect x="0" y="0" width="1800" height="1700" fill="#2f8c57"/>
 
-      <svg id="fieldSVG" viewBox="0 0 1800 1700" role="img" aria-label="Baseball field diagram with development grid">
-        <defs>
-          <linearGradient id="gGrass" x1="0" x2="1">
-            <stop offset="0" stop-color="var(--grass-light)"/>
-            <stop offset="1" stop-color="var(--grass-dark)"/>
-          </linearGradient>
-          <radialGradient id="dirtR" cx="50%" cy="40%">
-            <stop offset="0%" stop-color="#e2b887"/>
-            <stop offset="100%" stop-color="#c79b59"/>
-          </radialGradient>
-        </defs>
+    <!-- Infield dirt -->
+    <g transform="translate(900,900)">
+      <path d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="#d6a770" stroke="#b07a49" stroke-width="2"/>
 
-        <!-- Background -->
-        <rect x="0" y="0" width="1800" height="2400" fill="url(#gGrass)"/>
+      <!-- Bases -->
+      <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-3-1st-base-1b" tabindex="0" aria-label="First Base">
+        <rect x="660" y="-60" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6"/>
+        <text x="720" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
+      </a>
 
-        <!-- Outfield / warning track -->
-        <path id="warningTrack" d="M120 280 A1078 1078 0 0 1 1680 280 L1680 350 A1100 1100 0 0 0 120 350 Z"
-              fill="#d9c0a0" opacity="0.55"/>
+      <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-4-2nd-base-2b" tabindex="0" aria-label="Second Base">
+        <rect x="-60" y="-780" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6"/>
+        <text x="0" y="-712" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
+      </a>
 
-        <!-- Extra grass/dirt texture (decorative) -->
-        <g id="grassDetails" opacity="0.95">
-          <ellipse cx="900" cy="420" rx="700" ry="240" fill="rgba(0,0,0,0.03)"/>
-          <ellipse cx="900" cy="520" rx="760" ry="260" fill="rgba(0,0,0,0.02)"/>
-          <ellipse cx="520" cy="520" rx="220" ry="140" fill="rgba(16,47,33,0.06)"/>
-          <ellipse cx="1100" cy="900" rx="120" ry="52" fill="#d7ad78" opacity="0.22"/>
-          <ellipse cx="700"  cy="960" rx="84"  ry="36" fill="#d7ad78" opacity="0.18"/>
-          <path d="M120 340 A980 980 0 0 1 1680 340 L1680 380 A1000 1000 0 0 0 120 380 Z" fill="rgba(0,0,0,0.03)"/>
-        </g>
+      <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-5-3rd-base-3b" tabindex="0" aria-label="Third Base">
+        <rect x="-780" y="-60" width="120" height="120" rx="8" fill="#fff" stroke="#c6c6c6" stroke-width="6"/>
+        <text x="-720" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
+      </a>
 
-        <!-- Diamond group centered -->
-        <g id="diamondRoot" transform="translate(900,900)">
-          <!-- Infield dirt (diamond corners per your doc: 720) -->
-          <path id="infieldDirt" d="M0 -720 L720 0 L0 720 L-720 0 Z" fill="url(#dirtR)" stroke="#b07a49" stroke-width="2"/>
+      <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-2-catcher-c" tabindex="0" aria-label="Home Plate">
+        <polygon points="-52,720 52,720 52,684 0,648 -52,684" fill="#fff" stroke="#c6c6c6" stroke-width="4"/>
+      </a>
 
-          <!-- Baselines (infield chalk) -->
-          <path id="baseline_home_1" d="M0 -720 L720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_1_2"     d="M720 0 L0 720"  stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_2_3"     d="M0 720 L-720 0" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
-          <path id="baseline_3_home"  d="M-720 0 L0 -720" stroke="var(--chalk)" stroke-width="16" stroke-linecap="round"/>
+      <!-- Pitcher -->
+      <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-1-pitcher-p" tabindex="0" aria-label="Pitcher">
+        <circle cx="0" cy="100" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
+      </a>
+    </g>
 
-          <!-- Bases (drawn before placing foul lines so we can compute corner coords if needed) -->
-          <g id="firstBaseGroup" transform="translate(720,0)">
-            <rect id="firstBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="First base"/>
-            <text id="label1B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">1B</text>
-          </g>
+    <!-- Outfield hotspots -->
+    <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-7-left-field-lf" tabindex="0" aria-label="Left Field">
+      <rect x="280" y="250" width="160" height="60" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2"/>
+      <text x="360" y="290" font-size="20" text-anchor="middle" fill="#0d3c55" font-weight="700">Left Field</text>
+    </a>
 
-          <g id="secondBaseGroup" transform="translate(0,-720)">
-            <rect id="secondBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Second base"/>
-            <text id="label2B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">2B</text>
-          </g>
+    <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-8-center-field-cf" tabindex="0" aria-label="Center Field">
+      <rect x="820" y="50" width="160" height="60" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2"/>
+      <text x="900" y="90" font-size="20" text-anchor="middle" fill="#0d3c55" font-weight="700">Center Field</text>
+    </a>
 
-          <g id="thirdBaseGroup" transform="translate(-720,0)">
-            <rect id="thirdBase" class="hotspot" x="-60" y="-60" width="120" height="120" rx="8"
-                  fill="#fff" stroke="#c6c6c6" stroke-width="6" tabindex="0" role="button" aria-label="Third base"/>
-            <text id="label3B" x="0" y="8" font-size="36" text-anchor="middle" fill="#000" font-weight="700">3B</text>
-          </g>
+    <a class="hotspot" href="https://canvas.instructure.com/courses/13480398/pages/position-9-right-field-rf" tabindex="0" aria-label="Right Field">
+      <rect x="1360" y="250" width="160" height="60" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2"/>
+      <text x="1440" y="290" font-size="20" text-anchor="middle" fill="#0d3c55" font-weight="700">Right Field</text>
+    </a>
+  </svg>
 
-          <!-- Home plate rotated -->
-          <g id="homeGroup" transform="translate(0,720) rotate(180)">
-            <polygon id="homePlate" class="hotspot"
-                     points="-52,0 52,0 52,-36 0,-72 -52,-36" fill="#fff" stroke="#c6c6c6" stroke-width="4"
-                     tabindex="0" role="button" aria-label="Home plate"/>
-          </g>
-
-          <!-- Mound group -->
-          <g id="moundGroup" transform="translate(0,100)" aria-label="Pitcher's mound">
-            <circle id="moundCircle" cx="0" cy="0" r="92" fill="#b97f4f" stroke="#9b6237" stroke-width="6"/>
-            <rect id="pitcherPlate" class="hotspot" x="-20" y="-10" width="40" height="20" rx="3"
-                  fill="#fff" stroke="#666" stroke-width="6" tabindex="0" role="button" aria-label="Pitcher's plate"/>
-          </g>
-        </g>
-
-        <!-- Foul lines corrected to start at base corners and extend to canvas edges (absolute canvas coordinates) -->
-        <!-- Calculation notes: first base top-right corner canvas = (960,840); extend along baseline vector to right edge => endpoint (1800,0) -->
-        <line id="foulRight" x1="960" y1="840" x2="1800" y2="0" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
-
-        <!-- third base top-left corner canvas = (120,840); extend along baseline vector to left edge => endpoint (0,720) -->
-        <line id="foulLeft"  x1="120" y1="840" x2="0" y2="720" stroke="var(--chalk)" stroke-width="6" stroke-linecap="round" pointer-events="none"/>
-
-        <!-- Outfield clickable boxes (replace text labels). These are absolute canvas coords -->
-        <!-- Left Field box centered near previous LF label (approx x=640,y=560) -->
-        <g id="outfieldBoxes" aria-hidden="false">
-          <rect id="lfBox" x="560" y="530" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Left Field"/>
-          <text x="640" y="570" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Left Field</text>
-
-          <!-- Center Field -->
-          <rect id="cfBox" x="820" y="320" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Center Field"/>
-          <text x="900" y="360" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Center Field</text>
-
-          <!-- Right Field -->
-          <rect id="rfBox" x="1040" y="530" width="160" height="60" rx="8" fill="#ffffffaa" stroke="#0d3c55" stroke-width="2" class="hotspot" tabindex="0" role="button" aria-label="Right Field"/>
-          <text x="1120" y="570" font-size="16" text-anchor="middle" fill="#0d3c55" font-weight="700">Right Field</text>
-        </g>
-
-        <!-- Coach boxes, on-deck, and dev grid remain (unchanged) -->
-        <g id="coachBoxes">
-          <g id="coach1" transform="translate(1520,1050) rotate(315)">
-            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
-            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (1B)</text>
-          </g>
-          <g id="coach3" transform="translate(280,1050) rotate(-315)">
-            <rect x="-80" y="-22" width="160" height="44" rx="8" fill="#fff" stroke="#d9d9d9"/>
-            <text x="0" y="8" font-size="16" text-anchor="middle" fill="#596a6e">Coach's box (3B)</text>
-          </g>
-        </g>
-
-        <g id="onDecks">
-          <circle id="onDeckLeft"  cx="280"  cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text id="onDeckLeftLabel" x="280" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
-          <circle id="onDeckRight" cx="1520" cy="1500" r="36" fill="#fff" stroke="#d9d9d9"/>
-          <text id="onDeckRightLabel" x="1520" y="1508" font-size="14" text-anchor="middle" fill="#000">On‑deck</text>
-        </g>
-
-        <!-- DEV GRID -->
-        <g id="devGrid" stroke="#0d3c55" stroke-width="1" opacity="0.45" fill="#0d3c55" font-family="Arial,Helvetica,sans-serif">
-          <g id="gridColumns">
-            <line x1="200" x2="200" y1="0" y2="1700"/><text class="gridLabel" x="196" y="28">A</text>
-            <line x1="400" x2="400" y1="0" y2="1700"/><text class="gridLabel" x="396" y="28">B</text>
-            <line x1="600" x2="600" y1="0" y2="1700"/><text class="gridLabel" x="596" y="28">C</text>
-            <line x1="800" x2="800" y1="0" y2="1700"/><text class="gridLabel" x="796" y="28">D</text>
-            <line x1="1000" x2="1000" y1="0" y2="1700"/><text class="gridLabel" x="996" y="28">E</text>
-            <line x1="1200" x2="1200" y1="0" y2="1700"/><text class="gridLabel" x="1196" y="28">F</text>
-            <line x1="1400" x2="1400" y1="0" y2="1700"/><text class="gridLabel" x="1396" y="28">G</text>
-            <line x1="1600" x2="1600" y1="0" y2="1700"/><text class="gridLabel" x="1596" y="28">H</text>
-            <line x1="100" x2="100" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="300" x2="300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="500" x2="500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="700" x2="700" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="900" x2="900" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="1100" x2="1100" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="1300" x2="1300" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="1500" x2="1500" y1="0" y2="1700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-          </g>
-          <g id="gridRows">
-            <line x1="0" x2="1800" y1="200" y2="200"/><text class="gridLabel" x="24" y="206">1</text>
-            <line x1="0" x2="1800" y1="400" y2="400"/><text class="gridLabel" x="24" y="406">2</text>
-            <line x1="0" x2="1800" y1="600" y2="600"/><text class="gridLabel" x="24" y="606">3</text>
-            <line x1="0" x2="1800" y1="800" y2="800"/><text class="gridLabel" x="24" y="806">4</text>
-            <line x1="0" x2="1800" y1="1000" y2="1000"/><text class="gridLabel" x="24" y="1006">5</text>
-            <line x1="0" x2="1800" y1="1200" y2="1200"/><text class="gridLabel" x="24" y="1206">6</text>
-            <line x1="0" x2="1800" y1="1400" y2="1400"/><text class="gridLabel" x="24" y="1406">7</text>
-            <line x1="0" x2="1800" y1="1600" y2="1600"/><text class="gridLabel" x="24" y="1606">8</text>
-            <line x1="0" x2="1800" y1="100" y2="100" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="300" y2="300" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="500" y2="500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="700" y2="700" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="900" y2="900" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="1100" y2="1100" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="1300" y2="1300" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-            <line x1="0" x2="1800" y1="1500" y2="1500" stroke="#0d3c55" stroke-width="0.6" opacity="0.25"/>
-          </g>
-
-          <g id="gridDots" opacity="0.6" fill="#0d3c55">
-            <circle cx="600" cy="1000" r="3"/><!-- C5 -->
-            <circle cx="200" cy="1200" r="3"/><!-- A6 -->
-            <circle cx="1400" cy="1200" r="3"/><!-- G6 -->
-          </g>
-        </g>
-
-      </svg>
-
-      <div class="legend">Legend: Outfield boxes are clickable for the quiz. When layout is final, click <em>Remove Grid</em>.</div>
-
-      <div class="controls" style="margin-top:12px;">
-        <button class="btn" id="removeGridBtn">Remove Grid</button>
-        <button class="btn secondary" id="resetBtn">Reset View</button>
-      </div>
-
-      <!-- Quiz checklist UI -->
-      <div id="quizWrap" style="margin-top:14px;display:flex;gap:12px;align-items:flex-start">
-        <div id="quizPrompt" style="flex:1">
-          <div style="font-weight:700;margin-bottom:6px">Spot the part</div>
-          <div id="quizInstruction" style="color:#61777b;font-size:13px">Click the named field part on the diagram. No grade — just check your knowledge.</div>
-          <div style="margin-top:10px">
-            <button id="quizStartBtn" class="btn secondary" style="padding:8px 10px">Start Quiz</button>
-            <button id="quizResetBtn" class="btn" style="margin-left:6px;display:none">Reset</button>
-          </div>
-        </div>
-
-        <div id="quizChecklist" style="width:280px;border-left:1px solid rgba(0,0,0,0.04);padding-left:12px">
-          <div style="font-weight:700;margin-bottom:8px">Checklist</div>
-          <ul id="quizList" style="list-style:none;padding:0;margin:0;color:#13353a"></ul>
-        </div>
-      </div>
-
-    </div>
+  <!-- Fallback text navigation -->
+  <div style="margin-top:20px;padding:12px;background:#f8f9fa;border-left:6px solid #839192;border-radius:8px;">
+    <strong>Text Navigation:</strong>
+    <ul style="margin:8px 0 0 18px;line-height:1.6;">
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-1-pitcher-p">Pitcher</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-2-catcher-c">Catcher</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-3-1st-base-1b">First Base</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-4-2nd-base-2b">Second Base</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-5-3rd-base-3b">Third Base</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-6-shortstop-ss">Shortstop</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-7-left-field-lf">Left Field</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-8-center-field-cf">Center Field</a></li>
+      <li><a href="https://canvas.instructure.com/courses/13480398/pages/position-9-right-field-rf">Right Field</a></li>
+    </ul>
   </div>
-
-<script>
-  // Info mapping (now includes outfield boxes)
-  const info = {
-    'firstBase': {title:'First Base', text:'The first base bag. Click to read more.'},
-    'secondBase': {title:'Second Base', text:'Second base is at the top of the diamond.'},
-    'thirdBase': {title:'Third Base', text:'Third base is the third corner of the diamond.'},
-    'homePlate': {title:'Home Plate', text:'Home plate is where batters stand and runs are scored.'},
-    'pitcherPlate': {title:"Pitcher's Plate", text:'The white rectangle on the mound where the pitcher throws from.'},
-    'moundCircle': {title:"Pitcher’s Mound", text:'The circular raised mound near the center of the infield.'},
-    'lfBox': {title:'Left Field', text:'Left field area; click to learn more.'},
-    'cfBox': {title:'Center Field', text:'Center field area; click to learn more.'},
-    'rfBox': {title:'Right Field', text:'Right field area; click to learn more.'},
-    'onDeckLeft': {title:'On-deck (Left)', text:'On-deck circle left.'},
-    'onDeckRight': {title:'On-deck (Right)', text:'On-deck circle right.'}
-  };
-
-  // Attach info card handlers
-  Object.keys(info).forEach(key=>{
-    const el = document.getElementById(key);
-    if(!el) return;
-    el.addEventListener('click', (ev)=>{
-      showCard(info[key].title, info[key].text, ev.clientX, ev.clientY);
-      ev.stopPropagation();
-    });
-    el.addEventListener('keydown', (ev)=>{
-      if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); showCard(info[key].title, info[key].text, ev.clientX, ev.clientY); }
-    });
-  });
-
-  const card = document.getElementById('infoCard');
-  const cardTitle = document.getElementById('cardTitle');
-  const cardBody = document.getElementById('cardBody');
-  const cardClose = document.getElementById('cardClose');
-
-  function showCard(title, body, x, y){
-    cardTitle.textContent = title;
-    cardBody.textContent = body;
-    card.style.display = 'block';
-    card.setAttribute('aria-hidden','false');
-    const panelRect = document.getElementById('panel').getBoundingClientRect();
-    const left = Math.min(Math.max(16, x - panelRect.left + 8), panelRect.width - 280);
-    const top  = Math.min(Math.max(16, y - panelRect.top + 8), panelRect.height - 120);
-    card.style.left = left + 'px';
-    card.style.top  = top + 'px';
-  }
-  function hideCard(){ card.style.display = 'none'; card.setAttribute('aria-hidden','true'); }
-  cardClose.addEventListener('click', hideCard);
-  cardClose.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' ') hideCard(); });
-
-  // Hide card when clicking outside
-  document.addEventListener('click', (ev)=>{
-    const inside = ev.target.closest('.infoCard') || ev.target.closest('.hotspot') || ev.target.closest('.panel');
-    if(!inside) hideCard();
-  });
-  document.addEventListener('keydown', (ev)=>{ if(ev.key==='Escape') hideCard(); });
-
-  // Remove grid / reset
-  document.getElementById('removeGridBtn').addEventListener('click', ()=>{ removeDevGrid(); });
-  document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
-  function removeDevGrid(){ const g = document.getElementById('devGrid'); if(g) g.parentNode.removeChild(g); }
-
-  // convertGridRef helper (keeps your earlier logic)
-  function convertGridRef(ref){
-    const match = String(ref).toUpperCase().match(/^([A-H])(\d(?:\.\d)?)$/);
-    if(!match) return null;
-    const col = match[1];
-    const row = parseFloat(match[2]);
-    const colIndex = col.charCodeAt(0) - 65;
-    const xFinal = 200 + colIndex*200 + ( (ref.includes('.5')) ? 100 : 0 );
-    const yFinal = row * 200;
-    return {x: xFinal, y: yFinal};
-  }
-
-  // ===== Quiz module (non-graded) with outfield boxes included =====
-  (function(){
-    const PARTS = [
-      {id:'homePlate', name:'Home Plate'},
-      {id:'firstBase', name:'First Base'},
-      {id:'secondBase', name:'Second Base'},
-      {id:'thirdBase', name:'Third Base'},
-      {id:'moundCircle', name:"Pitcher's Mound"},
-      {id:'onDeckLeft', name:'On-deck Left'},
-      {id:'onDeckRight', name:'On-deck Right'},
-      {id:'lfBox', name:'Left Field'},
-      {id:'cfBox', name:'Center Field'},
-      {id:'rfBox', name:'Right Field'}
-    ];
-
-    const startBtn = document.getElementById('quizStartBtn');
-    const resetBtn = document.getElementById('quizResetBtn');
-    const quizList = document.getElementById('quizList');
-    const instruction = document.getElementById('quizInstruction');
-
-    let currentSequence = [];
-    let currentIndex = 0;
-    let foundSet = new Set();
-
-    function renderChecklist(){
-      quizList.innerHTML = '';
-      PARTS.forEach(part=>{
-        const li = document.createElement('li');
-        li.id = 'chk_'+part.id;
-        li.style.padding = '6px 0';
-        li.style.display = 'flex';
-        li.style.justifyContent = 'space-between';
-        li.style.alignItems = 'center';
-        li.innerHTML = `<span>${part.name}</span><span aria-hidden="true" style="width:22px;text-align:right;color:#8aa7a4">—</span>`;
-        quizList.appendChild(li);
-      });
-    }
-
-    function shuffle(a){
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]]=[a[j],a[i]];
-      }
-      return a;
-    }
-
-    function startQuiz(){
-      currentSequence = shuffle(PARTS.map(p=>p.id)).slice();
-      currentIndex = 0;
-      foundSet.clear();
-      renderChecklist();
-      highlightPrompt();
-      startBtn.style.display = 'none';
-      resetBtn.style.display = '';
-      instruction.textContent = 'Click the highlighted part on the field.';
-    }
-
-    function resetQuiz(){
-      currentSequence = [];
-      currentIndex = 0;
-      foundSet.clear();
-      renderChecklist();
-      clearPrompts();
-      startBtn.style.display='';
-      resetBtn.style.display='none';
-      instruction.textContent = 'Click Start Quiz to begin.';
-    }
-
-    function highlightPrompt(){
-      clearPrompts();
-      if(currentIndex >= currentSequence.length) {
-        instruction.textContent = 'Nice work — you found them all!';
-        return;
-      }
-      const id = currentSequence[currentIndex];
-      const part = PARTS.find(p=>p.id===id);
-      if(!part) return;
-      instruction.textContent = `Find: ${part.name}`;
-      const el = document.getElementById(id);
-      if(el){
-        el.dataset.quizHighlight = '1';
-        el.style.transition = 'filter 200ms, opacity 200ms';
-        el.style.filter = 'drop-shadow(0 8px 10px rgba(13,60,85,0.18))';
-        if(el.tagName==='rect' || el.tagName==='polygon' || el.tagName==='circle'){
-          el.style.opacity = 0.95;
-        }
-        el.setAttribute('aria-describedby','quizHint');
-      }
-    }
-
-    function clearPrompts(){
-      PARTS.forEach(p=>{
-        const el = document.getElementById(p.id);
-        if(!el) return;
-        delete el.dataset.quizHighlight;
-        el.style.filter = '';
-        el.style.opacity = '';
-        el.removeAttribute('aria-describedby');
-      });
-    }
-
-    function markFound(id){
-      const li = document.getElementById('chk_'+id);
-      if(!li) return;
-      const mark = li.querySelector('span:last-child');
-      if(mark) mark.textContent = '✓';
-      li.style.color = '#0d3c55';
-    }
-
-    function partClicked(ev){
-      const id = ev.currentTarget.id;
-      if(!currentSequence || currentSequence.length===0){
-        return;
-      }
-      if(foundSet.has(id)) return;
-      const expected = currentSequence[currentIndex];
-      if(id === expected){
-        foundSet.add(id);
-        markFound(id);
-        currentIndex++;
-        const el = ev.currentTarget;
-        if(el.animate) el.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:220});
-        if(currentIndex < currentSequence.length){
-          highlightPrompt();
-        } else {
-          clearPrompts();
-          instruction.textContent = 'All done — nice work!';
-        }
-      } else {
-        if(ev.currentTarget.animate) {
-          ev.currentTarget.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:240});
-        }
-      }
-    }
-
-    function attachPartHandlers(){
-      PARTS.forEach(p=>{
-        const el = document.getElementById(p.id);
-        if(!el) return;
-        if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex','0');
-        el.addEventListener('click', partClicked);
-        el.addEventListener('keydown', ev=>{ if(ev.key==='Enter' || ev.key===' '){ ev.preventDefault(); partClicked({currentTarget:ev.currentTarget}); }});
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      renderChecklist();
-      attachPartHandlers();
-      instruction.textContent = 'Click Start Quiz to begin.';
-      startBtn.addEventListener('click', startQuiz);
-      resetBtn.addEventListener('click', resetQuiz);
-    });
-
-    window._fieldExplorer = window._fieldExplorer || {};
-    window._fieldExplorer.resetQuiz = resetQuiz;
-  })();
-
-  // Keyboard shortcut to remove grid (Ctrl+G)
-  document.addEventListener('keydown', (ev)=>{
-    if(ev.key==='g' && ev.ctrlKey){
-      const g = document.getElementById('devGrid');
-      if(g) g.remove();
-    }
-  });
-</script>
+</div>
 </body>
 </html>
-
-
-
-
+🔧 Next: Dialing in GitHub Pages
