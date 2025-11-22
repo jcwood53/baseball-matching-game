@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Baseball Field</title>
+    <style>
+        /* Ensure the container fits within Canvas iframes gracefully */
+        body {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            background-color: #f0f0f0; /* Optional background color */
+        }
+
+        /* This is the main wrapper that holds image and hotspots */
+        .field-container {
+            position: relative;
+            max-width: 800px; /* Maximum width of the diagram */
+            width: 100%; /* Responsive width */
+        }
+
+        /* The realistic field image */
+        .field-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Common styles for all hotspots */
+        .hotspot {
+            position: absolute;
+            border-radius: 50%; /* Makes them circular */
+            cursor: pointer;
+            z-index: 10; /* Ensures they sit on top of the image */
+            
+            /* By default, the hotspots are invisible. 
+               Change 'transparent' to 'rgba(255, 0, 0, 0.5)' if you want 
+               to see them while setting them up.
+            */
+            background-color: transparent; 
+            
+            /* A subtle transition for hover effects */
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Optional: Visual feedback when hovering over a position */
+        .hotspot:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            border: 2px solid rgba(255, 215, 0, 0.7); /* Gold border on hover */
+        }
+
+        /* ============================================================
+           POSITIONING AND SIZING 
+           These use percentages so they move if the image resizes.
+           You may need to tweak these slightly depending on your specific image.
+        ============================================================ */
+
+        /* Standard size for infielders */
+        .infield-size { width: 8%; height: 10%; }
+        /* Standard size for outfielders (covering more ground) */
+        .outfield-size { width: 12%; height: 15%; }
+
+        /* Pitcher */
+        .pos-p { top: 52%; left: 46%; }
+
+        /* Catcher */
+        .pos-c { top: 82%; left: 46%; height: 8%; }
+
+        /* 1st Base */
+        .pos-1b { top: 50%; left: 63%; }
+
+        /* 2nd Base (Shifted slightly toward 1B side of bag usually) */
+        .pos-2b { top: 38%; left: 53%; }
+
+        /* Shortstop */
+        .pos-ss { top: 38%; left: 34%; }
+
+        /* 3rd Base */
+        .pos-3b { top: 50%; left: 27%; }
+
+        /* Left Field */
+        .pos-lf { top: 20%; left: 15%; }
+
+        /* Center Field */
+        .pos-cf { top: 10%; left: 44%; }
+
+        /* Right Field */
+        .pos-rf { top: 20%; left: 70%; }
+
+    </style>
+</head>
+<body>
+
+    <div class="field-container">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Baseball_diamond_marino.jpg/800px-Baseball_diamond_marino.jpg" alt="Baseball Field Diagram" class="field-image">
+
+        <a href="" class="hotspot infield-size pos-p" title="Pitcher" target="_blank"></a>
+
+        <a href="" class="hotspot infield-size pos-c" title="Catcher" target="_blank"></a>
+
+        <a href="" class="hotspot infield-size pos-1b" title="First Base" target="_blank"></a>
+
+        <a href="" class="hotspot infield-size pos-2b" title="Second Base" target="_blank"></a>
+
+        <a href="" class="hotspot infield-size pos-3b" title="Third Base" target="_blank"></a>
+
+        <a href="" class="hotspot infield-size pos-ss" title="Shortstop" target="_blank"></a>
+
+        <a href="" class="hotspot outfield-size pos-lf" title="Left Field" target="_blank"></a>
+
+        <a href="" class="hotspot outfield-size pos-cf" title="Center Field" target="_blank"></a>
+
+        <a href="" class="hotspot outfield-size pos-rf" title="Right Field" target="_blank"></a>
+
+    </div>
+
+</body>
+</html>
